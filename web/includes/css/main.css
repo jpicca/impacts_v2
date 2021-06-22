@@ -1,0 +1,45 @@
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+#map-holder {
+    overflow: hidden;
+}
+
+#contentwrapper {
+    padding: 0;
+}
+
+.chart {
+    text-align: center;
+}
+
+/* Navigation Bar */
+#mainNav {
+    padding: 0rem 1rem;
+    font-size: 0.8rem;
+}
+
+.style5 { color: rgb(0, 0, 0); font-weight: bold; }
+
+.cwa, .co {
+    visibility: hidden;
+}
+
+/* #state-choice, #cwa-choice, #map-fill {
+    display: none;
+} */
+
+.chart span {
+    font-size: 0.75rem;
+}
+
+table {
+    font-size: 0.7rem;
+}
+
+.tor-paths {
+    stroke-width:1;
+    opacity: 0.5;
+}
+
