@@ -1,6 +1,7 @@
 import constants from './const.js'
 import update from './update.js'
 import {makeMap} from './mapping.js'
+import {makeMatrix} from './time-matrix.js'
 
 // for ( let i = 1; i < constants.nsims + 1; i++) { constants.sim_range.push(i) }
 var dm, du;
@@ -15,11 +16,17 @@ $(window).on('load', async function() {
     let response = await dm.readJson('../data/output/examples/jsonResponse.json')
     let jsonText = JSON.parse(response)
 
+    let response2 = await dm.readJson('../data/output/examples/jsonResponse_time.json')
+    let jsonText2 = JSON.parse(response2)
+
     constants.quants = jsonText;
+    constants.time = jsonText2;
 
     du.updateTable('National')
 
+    makeMatrix()
     makeMap()
+    
     
     // Set-up menu change callback
     // document.getElementById('gran').addEventListener('change', du.menuChange)

@@ -29,13 +29,15 @@ var torMap = d3.json(`${path_pre}day1_torn.geojson`)
 var mapData = [stateMap, cwaMap, femaMap, torMap]
 var mu = update();
 
-// Initialize leaflet map
-var natLayer, statesLayer, cwasLayer, femaLayer, torLayer, control;
-var map = L.map('map-holder').setView([39.8283, -98.5795], 3);
+// // Initialize leaflet map
+var map, natLayer, statesLayer, cwasLayer, femaLayer, torLayer, control, info;
+// var map = L.map('map-holder').setView([39.8283, -98.5795], 3);
 
-L.tileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo( map );
+// L.tileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+// }).addTo( map );
+// // Info window
+// var info = L.control({position: 'bottomleft'});
 
 function getFeatureData(loc,impact,perc,type='Current') {
 
@@ -57,23 +59,78 @@ function returnColor(loc,impact,perc,type='Current') {
 
 }
 
-function style(feature) {
+function style(feature,level) {
 
-    let loc = locCodes[feature.properties.NAME];
+    let loc;
     let impact = mu.currentStatus.Impact;
     let perc = mu.currentStatus.Percentile
 
-    return {
+    switch(level) {
+        case 'National':
 
-        fillColor: returnColor(loc,impact,perc),
-        weight: 1,
-        fillOpacity: 0.7,
-        color: '#432'
+            loc = locCodes[feature.properties.NAME];
+
+            return {
+
+                fillColor: returnColor(loc,impact,perc),
+                weight: 1,
+                fillOpacity: 0.7,
+                color: '#432'
+        
+            }
+
+        case 'State':
+            
+            loc = locCodes[feature.properties.NAME];
+
+            return {
+
+                fillColor: returnColor(loc,impact,perc),
+                weight: 1,
+                fillOpacity: 0.7,
+                color: '#432'
+        
+            }
+
+        case 'CWA':
+            
+            loc = feature.properties.CWA;
+
+            return {
+
+                fillColor: returnColor(loc,impact,perc),
+                weight: 1,
+                fillOpacity: 0.7,
+                color: '#432'
+        
+            }
+
+        case 'FEMA':
+            
+            loc = feature.properties.region;
+
+            return {
+
+                fillColor: returnColor(loc,impact,perc),
+                weight: 1,
+                fillOpacity: 0.7,
+                color: '#432'
+        
+            }
 
     }
 }
 
 export function makeMap() {
+
+    // Initialize leaflet map
+    map = L.map('map-holder').setView([39.8283, -98.5795], 3);
+
+    L.tileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo( map );
+    // Info window
+    info = L.control({position: 'bottomleft'});
 
     Promise.all(mapData).then(files =>
         
@@ -83,7 +140,9 @@ export function makeMap() {
             let fema = files[2];
             let tor = files[3];
 
-            natLayer = L.geoJson(states, {style: style}).addTo(map);
+            natLayer = L.geoJson(states, {style: function(feature){
+                return style(feature,'National')
+            }}).addTo(map);
             natLayer.options.what = 'National'
                 
             //     weight: 1, //Attributes of polygons including the weight of boundaries and colors of map.
@@ -93,28 +152,55 @@ export function makeMap() {
             //     fillColor: returnColor(feature,mu.currentStatus.Impact,mu.currentStatus.Percentile)
             // }).addTo(map);
 
-            statesLayer = L.geoJson(states, { //instantiates a new geoJson layer using built in geoJson handling
-                weight: 1, //Attributes of polygons including the weight of boundaries and colors of map.
-                color: "#432",
-                what: 'State',
-                onEachFeature: onEachFeature
-            })
+            statesLayer = L.geoJson(states, 
+                {
+                    style: function(feature){
+                        return style(feature,'State')
+                    },
+                    onEachFeature: onEachFeature
+                })
+            statesLayer.options.what = 'State'
+
+            // statesLayer = L.geoJson(states, { //instantiates a new geoJson layer using built in geoJson handling
+            //     weight: 1, //Attributes of polygons including the weight of boundaries and colors of map.
+            //     color: "#432",
+            //     what: 'State',
+            //     onEachFeature: onEachFeature
+            // })
 
             map.fitBounds(statesLayer.getBounds());
 
-            cwasLayer = L.geoJson(cwas, { //instantiates a new geoJson layer using built in geoJson handling
-                weight: 1, //Attributes of polygons including the weight of boundaries and colors of map.
-                color: "#432",
-                what: 'CWA',
-                onEachFeature: onEachFeature
-            })
+            cwasLayer = L.geoJson(cwas, 
+                {
+                    style: function(feature){
+                        return style(feature,'CWA')
+                    },
+                    onEachFeature: onEachFeature
+                })
+            cwasLayer.options.what = 'CWA'
 
-            femaLayer = L.geoJson(fema, { //instantiates a new geoJson layer using built in geoJson handling
-                weight: 1, //Attributes of polygons including the weight of boundaries and colors of map.
-                color: "#432",
-                what: 'FEMA',
-                onEachFeature: onEachFeature
-            })
+            // cwasLayer = L.geoJson(cwas, { //instantiates a new geoJson layer using built in geoJson handling
+            //     weight: 1, //Attributes of polygons including the weight of boundaries and colors of map.
+            //     color: "#432",
+            //     what: 'CWA',
+            //     onEachFeature: onEachFeature
+            // })
+
+            femaLayer = L.geoJson(fema, 
+                {
+                    style: function(feature){
+                        return style(feature,'FEMA')
+                    },
+                    onEachFeature: onEachFeature
+                })
+            femaLayer.options.what = 'FEMA'
+
+            // femaLayer = L.geoJson(fema, { //instantiates a new geoJson layer using built in geoJson handling
+            //     weight: 1, //Attributes of polygons including the weight of boundaries and colors of map.
+            //     color: "#432",
+            //     what: 'FEMA',
+            //     onEachFeature: onEachFeature
+            // })
 
             torLayer = L.geoJson(tor, {
                 weight: 1,
@@ -149,6 +235,38 @@ export function makeMap() {
                 }
             })
 
+            // Control Opacity of the impact map fill
+            let slide = document.getElementById('slide')
+            slide.onchange = function() {
+                natLayer.setStyle({fillOpacity: this.value})
+                statesLayer.setStyle({fillOpacity: this.value})
+                cwasLayer.setStyle({fillOpacity: this.value})
+                femaLayer.setStyle({fillOpacity: this.value})
+            }
+
+            info.onAdd = function(map) {
+                this._div = L.DomUtil.create('div','info')
+                this.update();
+                return this._div;
+            }
+
+            info.update = function(props) {
+                let loc;
+                let impact = mu.currentStatus.Impact;
+                let perc = mu.currentStatus.Percentile
+
+                try {
+                    // Need a switch (or something similar) here for area type
+                    loc = locCodes[props.NAME];
+                } catch (err) {
+
+                }
+
+                this._div.innerHTML = `<h6> Impact: ${impact} </h6> ` + 
+                    (props ? getFeatureData(loc,impact,perc) : 'Hover over an area');
+            }
+
+            info.addTo(map);
         })
 }
 
@@ -166,6 +284,7 @@ function onEachFeature(feature, layer) {
 function highlightFeature(e) {
     var layer = e.target;
 
+    info.update(layer.feature.properties)
     layer.setStyle({
         weight: 5
         // color: '#666',
@@ -179,6 +298,8 @@ function highlightFeature(e) {
 }
 
 function resetHighlight(e) {
+
+    info.update()
     var layer = e.target;
     layer.setStyle({
         weight: 1

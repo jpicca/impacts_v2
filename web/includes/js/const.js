@@ -4,7 +4,9 @@ var constants = {
         '0.1': 'ten',
         '0.5': 'med',
         '0.9': 'ninety'
-    }
+    },
+    height: $(window).height(),
+    width: $(window).width()
 }
 
 //              //
@@ -33,6 +35,29 @@ export const fillColorDict = {
         '0.1': d3.scaleSequential([1,50], customReds),
         '0.5': d3.scaleSequential([1,100], customReds),
         '0.9': d3.scaleSequential([1,250], customReds)
+    }
+}
+
+export const fillColorTime = {
+    'population': {
+        '0.1': d3.scaleSequential([0,100], customReds),
+        '0.5': d3.scaleSequential([0,1000], customReds),
+        '0.9': d3.scaleSequential([0,10000], customReds)
+    },
+    'hospitals': {
+        '0.1': d3.scaleSequential([0,2], customReds),
+        '0.5': d3.scaleSequential([0,3], customReds),
+        '0.9': d3.scaleSequential([0,5], customReds)
+    },
+    'psubstations': {
+        '0.1': d3.scaleSequential([0,3], customReds),
+        '0.5': d3.scaleSequential([0,5], customReds),
+        '0.9': d3.scaleSequential([0,10], customReds)
+    },
+    'mobilehomes': {
+        '0.1': d3.scaleSequential([0,50], customReds),
+        '0.5': d3.scaleSequential([0,100], customReds),
+        '0.9': d3.scaleSequential([0,250], customReds)
     }
 }
 

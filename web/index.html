@@ -91,6 +91,14 @@
                         </select>
                     </div>
                   </li>
+                  <li class='nav-item py-1 px-lg-2'>
+                    <div class="optionbox" id="map-opacity">
+                      <span class="style5">Impact Map Opacity</span><br/>
+                      <input type="range" id="slide" min="0" max="1" step="0.1"
+                      value="0.7">
+
+                    </div>
+                  </li>
                   <!-- <li class='nav-item py-1 px-lg-2'>
                     <div class="optionbox" id="map-gran">
                       <span class="style5">Table Data</span>
@@ -221,9 +229,14 @@
                 <!-- <a href='../info-tor.html' target="_blank">Model Details</a> -->
 
                 <!-- <hr> -->
-
-                Time Matrix & intensity/damage rating scatter go here
-
+                <div class='row'>
+                  <div id='matrix-holder' class='col-lg-8'>
+                    Time Matrix
+                  </div>
+                  <div id='rating-holder' class='col-lg-4'>
+                    Ratings
+                  </div>
+                </div>
                 <!-- <h5>Expected Severe Hail & Damaging Wind Reports</h5>
                 <span class="lead" id="exp-hail" data-toggle="tooltip" title="Climo: Select a Valid CWA">Hail: Select a Valid CWA</span><br>
                 <span class="lead" id="exp-wind" data-toggle="tooltip" title="Climo: Select a Valid CWA">Wind: Select a Valid CWA</span><br>
@@ -273,6 +286,7 @@ crossorigin=""></script>
 <script src='./includes/js/dm.js'></script>
 <script type='module' src="./includes/js/mapping.js"></script>
 <script type='module' src='./includes/js/main.js'></script>
+<script type='module' src='./includes/js/time-matrix.js'></script>
 <!-- <script type='module' src='./includes/js/mapper.js'></script>
 <script type='module' src='./includes/js/charts.js'></script>
 <script type='module' src='./includes/js/stats.js'></script>

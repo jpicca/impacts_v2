@@ -63,7 +63,11 @@ export default function module() {
         }
 
         // Update table title
-        d3.select('#cur-val-table').text(`${exports.currentStatus.Type}: ${loc}`)
+        if (loc == 'National') {
+            d3.select('#cur-val-table').text(`${exports.currentStatus.Type}`)
+        } else {
+            d3.select('#cur-val-table').text(`${exports.currentStatus.Type}: ${loc}`)
+        }
 
     }
 
