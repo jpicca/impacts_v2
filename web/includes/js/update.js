@@ -1,6 +1,7 @@
 // This file contains code to update various elements of the page
 import constants from './const.js'
-// import {locCodes} from './const.js'
+import {drawGrids,updatePoints} from './time-matrix.js'
+import {popChart,hospChart,mobChart,powChart,formatSims} from './hist.js'
 
 export default function module() {
 
@@ -72,26 +73,65 @@ export default function module() {
     }
 
     // Function that changes all necessary elements when the location changes
-    exports.locChange = function (loc) {
+    exports.locChange = async function (loc) {
 
         // Things to do here...
         // - Update table values with updateTable
+        // - Update time matrix
         // - Update hist charts title
 
         exports.currentStatus.Type = exports.whichLevel(loc);
         exports.currentStatus.Location = loc;
 
 
-        let type = exports.currentStatus.Type
+        // let type = exports.currentStatus.Type
 
-        // Update Menu
-        // document.getElementById('gran').value = type;
-
-        console.log('loc Change function')
-        console.log(exports)
-
-
+        // Update table
         exports.updateTable(loc);
+
+        // Update time matrix
+        drawGrids(loc)
+
+        // Update Impacts scatter
+        // Need to first read in new set of sims
+        if (loc == 'TX') {
+            
+            let dm = dataManager.Manager();
+
+            let response = await dm.readJson('../data/output/examples/jsonResponse_sims_TX.json')
+            let jsonText = JSON.parse(response)
+
+            constants.sims = jsonText
+            
+            // Update Points
+            updatePoints('pop');
+            updatePoints('hosp');
+            updatePoints('mob');
+            updatePoints('pow');
+
+            // Update histograms
+            Promise.all(formatSims()).then(sims => {
+
+                let pop = sims[0]
+                let hosp = sims[1]
+                let mob = sims[2]
+                let pow = sims[3]
+
+                popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
+                hospChart.updateChart(hospChart.quantFormatter(hosp),'#hosp-chart')
+                mobChart.updateChart(mobChart.quantFormatter(mob),'#mob-chart')
+                powChart.updateChart(powChart.quantFormatter(pow),'#pow-chart')
+
+            })
+
+        } else {
+
+            console.log('Only TX updates the impacts scatter right now!')
+            console.log('Need to figure out how sims data will be delivered from backend...')
+            console.log('i.e., from API or from post-processed jsons/csvs')
+
+        }
+        
 
     }
 

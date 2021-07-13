@@ -3,6 +3,8 @@ import update from './update.js'
 import {locCodes} from './const.js'
 import constants from './const.js'
 import {fillColorDict} from './const.js'
+import { drawGrids, updatePoints } from './time-matrix.js'
+import {popChart,hospChart,mobChart,powChart,formatSims} from './hist.js'
 
 const path_pre = './includes/geo/'
 
@@ -225,12 +227,39 @@ export function makeMap() {
             control = new L.Control.Layers(impactControl, probControl).addTo(map);
 
             // Change table to national data if control layer changes to national
-            map.on('baselayerchange', function (e) {
+            map.on('baselayerchange', async function (e) {
                 if (e.layer.options.what == 'National') {
                     
                     mu.currentStatus.Type = 'National'
                     mu.currentStatus.Location = 'National'
                     mu.updateTable('National')
+                    drawGrids('National');
+
+                    // Need update of impacts box
+                    let dm = dataManager.Manager();
+                    let response = await dm.readJson('../data/output/examples/jsonResponse_sims.json')
+                    let jsonText = JSON.parse(response)
+
+                    constants.sims = jsonText
+                    
+                    // Update Points
+                    updatePoints('pop');
+                    updatePoints('hosp');
+                    updatePoints('mob');
+                    updatePoints('pow');
+
+                    Promise.all(formatSims()).then(sims => {
+
+                        let pop = sims[0]
+                        let hosp = sims[1]
+                        let mob = sims[2]
+                        let pow = sims[3]
+                
+                        popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
+                        hospChart.updateChart(hospChart.quantFormatter(hosp), '#hosp-chart')
+                        mobChart.updateChart(mobChart.quantFormatter(mob), '#mob-chart')
+                        powChart.updateChart(powChart.quantFormatter(pow), '#pow-chart')
+                    })
 
                 }
             })

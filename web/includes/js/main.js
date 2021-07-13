@@ -1,10 +1,14 @@
 import constants from './const.js'
 import update from './update.js'
 import {makeMap} from './mapping.js'
-import {makeMatrix} from './time-matrix.js'
+import {formatSims,histogram} from './hist.js'
+import {drawGrids, makeMatrix, makeScatter} from './time-matrix.js'
+import {popChart,hospChart,mobChart,powChart} from './hist.js'
 
 // for ( let i = 1; i < constants.nsims + 1; i++) { constants.sim_range.push(i) }
 var dm, du;
+// var popChart = new histogram(), hospChart = new histogram(), mobChart = new histogram(),
+//                     powChart = new histogram();
 
 $(window).on('load', async function() {
 
@@ -16,17 +20,41 @@ $(window).on('load', async function() {
     let response = await dm.readJson('../data/output/examples/jsonResponse.json')
     let jsonText = JSON.parse(response)
 
-    let response2 = await dm.readJson('../data/output/examples/jsonResponse_time.json')
+    let response2 = await dm.readJson('../data/output/examples/jsonResponse_time_sum.json')
     let jsonText2 = JSON.parse(response2)
+
+    let response3 = await dm.readJson('../data/output/examples/jsonResponse_sims.json')
+    let jsonText3 = JSON.parse(response3)
 
     constants.quants = jsonText;
     constants.time = jsonText2;
+    constants.sims = jsonText3;
 
     du.updateTable('National')
 
     makeMatrix()
+    makeScatter()
     makeMap()
-    
+
+    Promise.all(formatSims()).then(sims => {
+
+        let pop = sims[0]
+        let hosp = sims[1]
+        let mob = sims[2]
+        let pow = sims[3]
+
+        popChart.makeChart(popChart.quantFormatter(pop),'#pop-chart')
+
+        hospChart.makeChart(hospChart.quantFormatter(hosp), '#hosp-chart')
+
+        mobChart.makeChart(mobChart.quantFormatter(mob), '#mob-chart')
+
+        powChart.makeChart(powChart.quantFormatter(pow), '#pow-chart')
+    })
+
+    // let pop = await formatSims();
+    // console.log(pop)
+
     
     // Set-up menu change callback
     // document.getElementById('gran').addEventListener('change', du.menuChange)

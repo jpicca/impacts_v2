@@ -5,6 +5,12 @@ var constants = {
         '0.5': 'med',
         '0.9': 'ninety'
     },
+    impDict: {
+        'pop': 'people',
+        'hosp': 'hospitals',
+        'mob': 'mobile homes',
+        'pow': 'substations'
+    },
     height: $(window).height(),
     width: $(window).width()
 }

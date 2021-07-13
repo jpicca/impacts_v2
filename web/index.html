@@ -68,10 +68,14 @@
                         <input id='tordio' type='checkbox' value='tor'>
                     </div>
                 </li> -->
-                
+                  <li class='nav-item py-1 px-lg-2'>
+                    <div class="optionbox" id="menu-title">
+                      <span>Map Options</span>
+                    </div>
+                  </li>
                   <li class='nav-item py-1 px-lg-2'>
                     <div class="optionbox" id="map-underlay">
-                      <span class="style5">Impact</span>
+                      <span class="style5">Impact Type</span>
                       <br />
                         <select id="prod">
                             <option value="pop">Population</option>
@@ -83,7 +87,7 @@
                   </li>
                   <li class='nav-item py-1 px-lg-2'>
                     <div class="optionbox" id="map-fill">
-                        <span class="style5">Impact Map Fill</span><br/>
+                        <span class="style5">Quantile Fill</span><br/>
                         <select id="perc">
                             <option value="ten">10th Percentile</option>
                             <option value="med" selected>Median</option>
@@ -91,12 +95,28 @@
                         </select>
                     </div>
                   </li>
-                  <li class='nav-item py-1 px-lg-2'>
+                  <li class='nav-item py-1 px-lg-2' id='map-opacity-holder'>
                     <div class="optionbox" id="map-opacity">
-                      <span class="style5">Impact Map Opacity</span><br/>
+                      <span class="style5">Fill Opacity</span><br/>
                       <input type="range" id="slide" min="0" max="1" step="0.1"
                       value="0.7">
 
+                    </div>
+                  </li>
+                  <li class='nav-item py-1 px-lg-2'>
+                    <div class="optionbox" id="menu-title-2">
+                      <span>Data Field Options</span>
+                    </div>
+                  </li>
+                  <li class='nav-item py-1 px-lg-2'>
+                    <div class="optionbox" id="rating-choice">
+                      <span class="style5">Tornado Rating</span>
+                      <br />
+                        <select id="rating">
+                            <option value="all">All</option>
+                            <option value="sig">EF2+</option>
+                            <option value="vio">EF4+</option>
+                        </select>
                     </div>
                   </li>
                   <!-- <li class='nav-item py-1 px-lg-2'>
@@ -162,7 +182,7 @@
                         <th scope="col" class='ttor cell'>Tornadoes</th>
                         <th scope="col" class='tpop cell'>Population</th>
                         <th scope="col" class='thosp cell'>Hospitals</th>
-                        <th scope="col" class='tsco cell'>Schools</th>
+                        <!-- <th scope="col" class='tsco cell'>Schools</th> -->
                         <th scope="col" class='tmob cell'>Mobile Homes</th>
                         <th scope="col" class='tpow cell'>Power Substations</th>
                       </tr>
@@ -182,7 +202,7 @@
                             <td class='ttornadoes cell ten dat' data-toggle="tooltip"></td>
                             <td class='tpopulation cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
                             <td class='thospitals cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
-                            <td class='tschools cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
+                            <!-- <td class='tschools cell ten dat' data-toggle="tooltip" title="Climo goes here"></td> -->
                             <td class='tmobilehomes cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
                             <td class='tpsubstations cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
                         </tr>
@@ -191,7 +211,7 @@
                         <td class='ttornadoes cell med dat' data-toggle="tooltip"></td>
                         <td class='tpopulation cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='thospitals cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
-                        <td class='tschools cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
+                        <!-- <td class='tschools cell med dat' data-toggle="tooltip" title="Climo goes here"></td> -->
                         <td class='tmobilehomes cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='tpsubstations cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
                       </tr>
@@ -200,7 +220,7 @@
                         <td class='ttornadoes cell ninety dat' data-toggle="tooltip"></td>
                         <td class='tpopulation cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='thospitals cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
-                        <td class='tschools cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
+                        <!-- <td class='tschools cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td> -->
                         <td class='tmobilehomes cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='tpsubstations cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
                       </tr>
@@ -230,11 +250,15 @@
 
                 <!-- <hr> -->
                 <div class='row'>
-                  <div id='matrix-holder' class='col-lg-8'>
+                  <div id='matrix-holder' class='col-lg-7'>
                     Time Matrix
                   </div>
-                  <div id='rating-holder' class='col-lg-4'>
-                    Ratings
+                  <div id='rating-holder' class='col-lg-3'>
+                    By Tornado Rating
+                  </div>
+                  <div id="threshold-holder" class="col-lg-2">
+                    Thresholds
+                    <!-- <span>Sliders for each impact</span> -->
                   </div>
                 </div>
                 <!-- <h5>Expected Severe Hail & Damaging Wind Reports</h5>
@@ -284,9 +308,11 @@ crossorigin=""></script>
 
 <!-- Internal Scripts -->
 <script src='./includes/js/dm.js'></script>
+<script src='./includes/js/d3Ex.js'></script>
 <script type='module' src="./includes/js/mapping.js"></script>
 <script type='module' src='./includes/js/main.js'></script>
 <script type='module' src='./includes/js/time-matrix.js'></script>
+<script type='module' src='./includes/js/hist.js'></script>
 <!-- <script type='module' src='./includes/js/mapper.js'></script>
 <script type='module' src='./includes/js/charts.js'></script>
 <script type='module' src='./includes/js/stats.js'></script>
