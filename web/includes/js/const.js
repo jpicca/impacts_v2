@@ -6,10 +6,11 @@ var constants = {
         '0.9': 'ninety'
     },
     impDict: {
-        'pop': 'people',
+        'pop': 'population',
         'hosp': 'hospitals',
-        'mob': 'mobile homes',
-        'pow': 'substations'
+        'mob': 'mobilehomes',
+        'pow': 'psubstations',
+        'sco': 'schools'
     },
     height: $(window).height(),
     width: $(window).width()
@@ -41,6 +42,11 @@ export const fillColorDict = {
         '0.1': d3.scaleSequential([1,50], customReds),
         '0.5': d3.scaleSequential([1,100], customReds),
         '0.9': d3.scaleSequential([1,250], customReds)
+    },
+    'schools': {
+        '0.1': d3.scaleSequential([1,3], customReds),
+        '0.5': d3.scaleSequential([1,5], customReds),
+        '0.9': d3.scaleSequential([1,50], customReds)
     }
 }
 

@@ -1,7 +1,7 @@
 // This file contains code to update various elements of the page
 import constants from './const.js'
 import {drawGrids,updatePoints} from './time-matrix.js'
-import {popChart,hospChart,mobChart,powChart,formatSims} from './hist.js'
+import {popChart,hospChart,mobChart,powChart,formatSims,adjustDist} from './hist.js'
 
 export default function module() {
 
@@ -22,6 +22,10 @@ export default function module() {
             case 1:
                 return 'FEMA';
             case 2:
+                // Region '10' fails the check of 1 char so we need this block
+                if (loc == '10') {
+                    return 'FEMA';
+                }
                 return 'State';
             case 3:
                 return 'CWA';
@@ -83,8 +87,7 @@ export default function module() {
         exports.currentStatus.Type = exports.whichLevel(loc);
         exports.currentStatus.Location = loc;
 
-
-        // let type = exports.currentStatus.Type
+        let title = document.getElementById('prob-dist-title')
 
         // Update table
         exports.updateTable(loc);
@@ -92,13 +95,13 @@ export default function module() {
         // Update time matrix
         drawGrids(loc)
 
+        let dm = dataManager.Manager();
+
         // Update Impacts scatter
         // Need to first read in new set of sims
         if (loc == 'TX') {
-            
-            let dm = dataManager.Manager();
 
-            let response = await dm.readJson('../data/output/examples/jsonResponse_sims_TX.json')
+            let response = await dm.readJson('../data/output/examples/jsonResponse_sims_newTX.json')
             let jsonText = JSON.parse(response)
 
             constants.sims = jsonText
@@ -108,6 +111,7 @@ export default function module() {
             updatePoints('hosp');
             updatePoints('mob');
             updatePoints('pow');
+            updatePoints('sco');
 
             // Update histograms
             Promise.all(formatSims()).then(sims => {
@@ -116,6 +120,9 @@ export default function module() {
                 let hosp = sims[1]
                 let mob = sims[2]
                 let pow = sims[3]
+                let sco = sims[4]
+
+                title.innerText = `Tornado Impact Distributions (${loc})`
 
                 popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
                 hospChart.updateChart(hospChart.quantFormatter(hosp),'#hosp-chart')
@@ -123,17 +130,60 @@ export default function module() {
                 powChart.updateChart(powChart.quantFormatter(pow),'#pow-chart')
 
             })
+        } else if (loc == '6') {
+
+            let response = await dm.readJson('../data/output/examples/jsonResponse_sims_6.json')
+            let jsonText = JSON.parse(response)
+
+            constants.sims = jsonText
+            
+            // Update Points
+            updatePoints('pop');
+            updatePoints('hosp');
+            updatePoints('mob');
+            updatePoints('pow');
+            updatePoints('sco');
+
+            // Update histograms
+            Promise.all(formatSims()).then(sims => {
+
+                let pop = sims[0]
+                let hosp = sims[1]
+                let mob = sims[2]
+                let pow = sims[3]
+                let sco = sims[4]
+
+                title.innerText = `Tornado Impact Distributions (FEMA ${loc})`
+
+                popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
+                hospChart.updateChart(hospChart.quantFormatter(hosp),'#hosp-chart')
+                mobChart.updateChart(mobChart.quantFormatter(mob),'#mob-chart')
+                powChart.updateChart(powChart.quantFormatter(pow),'#pow-chart')
+
+            });
 
         } else {
 
-            console.log('Only TX updates the impacts scatter right now!')
+            console.log('Only TX & FEMA 6 update the impacts scatter right now!')
             console.log('Need to figure out how sims data will be delivered from backend...')
             console.log('i.e., from API or from post-processed jsons/csvs')
+
+            // Set it to make tor ratings go to 0 and hists disappear
+            constants.sims = []
+            updatePoints('pop');
+            updatePoints('hosp');
+            updatePoints('mob');
+            updatePoints('pow');
+            updatePoints('sco');
+
+            // Hide the distributions
+            adjustDist();
 
         }
         
 
     }
+
 
     // exports.menuChange = function() {
 

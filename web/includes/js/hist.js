@@ -5,53 +5,65 @@ var hist_margin = {top: 10, right: 20, bottom: 40, left: 40}
 export function formatSims() {
 
     let arr1, arr2, arr3;
-    let pop,hosp,mob,pow;
-    let pop_arr = [], hosp_arr = [], mob_arr = [], pow_arr = [];
-    let sims = [];
+    let pop,hosp,mob,pow,sco;
+    let pop_arr = [], hosp_arr = [], mob_arr = [], pow_arr = [], sco_arr = [];
+
+
+    // Might be worth exploring using danfo.js again here
+    // to groupby sims and sum, instead of looping through sims and filtering
 
     for (i=0;i<constants.nsims;i++) {
         
+        // Filter for each sim
         let weakSim = constants.sims[0]['Sims'].filter(entry => entry[0] == i+1)
         let sigSim = constants.sims[1]['Sims'].filter(entry => entry[0] == i+1)
         let vioSim = constants.sims[2]['Sims'].filter(entry => entry[0] == i+1)
         
-        pop = 0, hosp = 0, mob = 0, pow = 0;
+        pop = 0, hosp = 0, mob = 0, pow = 0, sco = 0;
 
         try {
             arr1 = weakSim[0].slice(1,)
-            pop += +arr1[0], hosp += +arr1[1], mob += +arr1[2], pow += +arr1[3]
+            pop += +arr1[0], hosp += +arr1[1], mob += +arr1[2], pow += +arr1[3], sco += +arr1[4];
 
         } catch(err) {
             
         }
         try {
             arr2 = sigSim[0].slice(1,)
-            pop += +arr2[0], hosp += +arr2[1], mob += +arr2[2], pow += +arr2[3]
+            pop += +arr2[0], hosp += +arr2[1], mob += +arr2[2], pow += +arr2[3], sco += +arr2[4];
         } catch(err) {
             
         }
         try {
             arr3 = vioSim[0].slice(1,)
-            pop += +arr3[0], hosp += +arr3[1], mob += +arr3[2], pow += +arr3[3]
+            pop += +arr3[0], hosp += +arr3[1], mob += +arr3[2], pow += +arr3[3], sco += +arr3[4];
         } catch(err) {
             
         }
 
-        pop_arr.push(pop), hosp_arr.push(hosp), mob_arr.push(mob), pow_arr.push(pow);
-
-        // let tot = arr1.map((num,idx) => num + arr2[idx] + arr3[idx])
-        // sims.push(tot)
+        pop_arr.push(pop), hosp_arr.push(hosp), mob_arr.push(mob), pow_arr.push(pow), sco_arr.push(sco);
 
     }
 
     // return new Promise((resolve,reject) => resolve(pop_arr, hosp_arr, mob_arr, pow_arr));
     
     // return new Promise((resolve,reject) => resolve(pop_arr, hosp_arr));
-    return [Promise.resolve(pop_arr), Promise.resolve(hosp_arr), Promise.resolve(mob_arr), Promise.resolve(pow_arr)];
+    return [Promise.resolve(pop_arr), Promise.resolve(hosp_arr), 
+        Promise.resolve(mob_arr), Promise.resolve(pow_arr),
+        Promise.resolve(sco_arr)];
 }
 
 
+export function adjustDist() {
 
+    d3.selectAll('.dist-chart')
+        .attr('opacity','0.1')
+
+    d3.selectAll('.no-tor')
+        .style('visibility','visible')
+
+
+}
 
 
 class charts {
@@ -78,7 +90,9 @@ export class histogram extends charts {
             }
 
             const svg = d3.select(container).append('svg');
-            svg.attr('width',this.width).attr('height',this.height);
+            svg.attr('width',this.width)
+                .attr('height',this.height)
+                .classed('dist-chart',true);
 
             svg.append("g").classed('x-axis',true);
             svg.append("g").classed('y-axis',true);
@@ -110,6 +124,10 @@ export class histogram extends charts {
         this.updateChart = function(data,container) {
 
             const svg = d3.select(container).select('svg')
+
+            // Format the divs to show the distributions
+            svg.attr('opacity',1);
+            d3.selectAll('.no-tor').style('visibility','hidden')
 
             let isMob = container == '#mob-chart'
 

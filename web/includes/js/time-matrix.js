@@ -5,7 +5,7 @@ var rat_margin = { top: 30, right: 10, bottom: 0, left: 30}
 var mat_width, mat_height, rat_width, rat_height, 
         gridHeight, gridWidth, buckets, colors, imps, times;
 var x,y;
-var imps = ["pop", "hosp", "mob", "pow"];
+var imps = ["pop", "hosp", "mob", "pow", "sco"];
 var cats = ['0-1','2-3','4-5']
 var nsims = 10000;
 
@@ -92,7 +92,7 @@ export function makeScatter() {
                                     .attr("x1", d => 0.5 + x(d))
                                     .attr("x2", d => 0.5 + x(d))
                                     .attr("y1", rat_margin.top + 0.5*gridHeight)
-                                    .attr("y2", rat_margin.top + 3.5*gridHeight))
+                                    .attr("y2", rat_margin.top + 4.5*gridHeight))
                         .attr('id','rat-grid')
 
     let inputs = div => div.style('transform',`translate(0,${rat_margin.top}px)`)
@@ -131,7 +131,8 @@ export function updatePoints(manImp) {
         pop: 1,
         hosp: 2,
         mob: 3,
-        pow: 4
+        pow: 4,
+        sco: 5
     }
 
     if (typeof(manImp) == 'object') {
@@ -146,7 +147,6 @@ export function updatePoints(manImp) {
 
     } 
     
-    
     // Need an else statement on how to update dots if we manually drive the update
     // e.g., we choose a new state and need to update all impacts
     
@@ -159,8 +159,12 @@ export function updatePoints(manImp) {
     cats.forEach(cat => {
         let data = constants.sims.filter(entry => entry.Level == cat);
 
-        let numThresh = data[0].Sims.filter(entry => entry[impMap[imp]] >= value).length
-        pcts.push({x: 100*numThresh/nsims, y: imp, cat: cat})
+        try {
+            let numThresh = data[0].Sims.filter(entry => entry[impMap[imp]] >= value).length
+            pcts.push({x: 100*numThresh/nsims, y: imp, cat: cat})
+        } catch(err) {
+            pcts.push({x: 0, y: imp, cat: cat})
+        }
  
     })
 
@@ -174,7 +178,7 @@ export function updatePoints(manImp) {
 export function drawPoints() {
 
     let pcts = [];
-    let thresh = {'pop': 1, 'hosp': 1, 'mob': 1, 'pow': 1}
+    let thresh = {'pop': 1, 'hosp': 1, 'mob': 1, 'pow': 1, 'sco': 1}
     let grid = d3.select('#rat-grid')
 
     cats.forEach(cat => {
@@ -218,7 +222,7 @@ export function makeMatrix() {
 
     mat_width = $('#matrix-holder').width() - margin.left - margin.right
     mat_height = $('.table').height() - margin.top - margin.bottom
-    gridHeight = Math.floor(mat_height / 4)
+    gridHeight = Math.floor(mat_height / 5)
     gridWidth = Math.floor(mat_width / 24)
     buckets = 9
     colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"] // alternatively colorbrewer.YlGnBu[9]
@@ -283,57 +287,147 @@ export function drawGrids(loc) {
     let filtered = constants.time.filter(entry => entry.Location == loc)
     let data = filtered[0]
 
-    times.forEach((label,i) => {
+    if (data) {
 
-        formatted.push(
-            {
-                imp: 'population',
-                row: 0,
-                column: i,
-                time: label,
-                value: data.Timing.population[label]
-            }
-        )
+        times.forEach((label,i) => {
 
-        formatted.push(
-            {
-                imp: 'hospitals',
-                row: 1,
-                column: i,
-                time: label,
-                value: data.Timing.hospitals[label]
-            }
-        )
+            formatted.push(
+                {
+                    imp: 'population',
+                    row: 0,
+                    column: i,
+                    time: label,
+                    value: data.Timing.population[label]
+                }
+            )
 
-        formatted.push(
-            {
-                imp: 'mobilehomes',
-                row: 2,
-                column: i,
-                time: label,
-                value: data.Timing.mobilehomes[label]
-            }
-        )
+            formatted.push(
+                {
+                    imp: 'hospitals',
+                    row: 1,
+                    column: i,
+                    time: label,
+                    value: data.Timing.hospitals[label]
+                }
+            )
 
-        formatted.push(
-            {
-                imp: 'psubstations',
-                row: 3,
-                column: i,
-                time: label,
-                value: data.Timing.psubstations[label]
-            }
-        )
+            formatted.push(
+                {
+                    imp: 'mobilehomes',
+                    row: 2,
+                    column: i,
+                    time: label,
+                    value: data.Timing.mobilehomes[label]
+                }
+            )
 
-    })
+            formatted.push(
+                {
+                    imp: 'psubstations',
+                    row: 3,
+                    column: i,
+                    time: label,
+                    value: data.Timing.psubstations[label]
+                }
+            )
 
-    let colorCurves = {
+            formatted.push(
+                {
+                    imp: 'schools',
+                    row: 4,
+                    column: i,
+                    time: label,
+                    value: data.Timing.schools[label]
+                }
+            )
 
-        'population': makeColorCurve(data.Timing.population),
-        'hospitals': makeColorCurve(data.Timing.hospitals),
-        'mobilehomes': makeColorCurve(data.Timing.mobilehomes),
-        'psubstations': makeColorCurve(data.Timing.psubstations)
+        })
+    } else {
+        times.forEach((label,i) => {
 
+            formatted.push(
+                {
+                    imp: 'population',
+                    row: 0,
+                    column: i,
+                    time: label,
+                    value: 0
+                }
+            )
+
+            formatted.push(
+                {
+                    imp: 'hospitals',
+                    row: 1,
+                    column: i,
+                    time: label,
+                    value: 0
+                }
+            )
+
+            formatted.push(
+                {
+                    imp: 'mobilehomes',
+                    row: 2,
+                    column: i,
+                    time: label,
+                    value: 0
+                }
+            )
+
+            formatted.push(
+                {
+                    imp: 'psubstations',
+                    row: 3,
+                    column: i,
+                    time: label,
+                    value: 0
+                }
+            )
+
+            formatted.push(
+                {
+                    imp: 'schools',
+                    row: 4,
+                    column: i,
+                    time: label,
+                    value: 0
+                }
+            )
+
+        })
+    }
+
+    let colorCurves;
+
+    try {
+        colorCurves = {
+
+            'population': makeColorCurve(data.Timing.population),
+            'hospitals': makeColorCurve(data.Timing.hospitals),
+            'mobilehomes': makeColorCurve(data.Timing.mobilehomes),
+            'psubstations': makeColorCurve(data.Timing.psubstations),
+            'schools': makeColorCurve(data.Timing.schools)
+
+        }
+    } catch(err) {
+        console.log('No data for this selection')
+
+        // Just using some default data below to fill the time matrix when there are
+        // no data
+
+        let reds = d3.scaleLinear().range(["rgb(255,245,240)", "rgb(214,37,34)"]);
+        let curve = d3.scaleSequential([0,100, reds])
+
+        colorCurves = {
+
+            'population': [curve,1],
+            'hospitals': [curve,1],
+            'mobilehomes': [curve,1],
+            'psubstations': [curve,1],
+            'schools': [curve,1]
+
+        }
     }
 
     let cards = svg.selectAll("rect")
@@ -357,7 +451,7 @@ export function drawGrids(loc) {
                         .data(formatted, d => d.value)
                         .join('text')
                         .attr("x", function(d) { return d.column * gridWidth + 0.5*gridWidth; })
-                        .attr("y", function(d) { return d.row * gridHeight + 0.5*gridHeight; })
+                        .attr("y", function(d) { return d.row * gridHeight + 0.6*gridHeight; })
                         .attr("class", "percent bordered")
                         .attr("text-anchor","middle")
                         .attr("font-size", 8)

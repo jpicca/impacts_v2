@@ -17,13 +17,13 @@ $(window).on('load', async function() {
 
     // * Currently an example file *
     // * Reading from a regular json
-    let response = await dm.readJson('../data/output/examples/jsonResponse.json')
+    let response = await dm.readJson('../data/output/examples/jsonResponse_schoolsfema.json')
     let jsonText = JSON.parse(response)
 
-    let response2 = await dm.readJson('../data/output/examples/jsonResponse_time_sum.json')
+    let response2 = await dm.readJson('../data/output/examples/jsonResponse_time_sum_schoolsfema.json')
     let jsonText2 = JSON.parse(response2)
 
-    let response3 = await dm.readJson('../data/output/examples/jsonResponse_sims.json')
+    let response3 = await dm.readJson('../data/output/examples/jsonResponse_sims_newnat.json')
     let jsonText3 = JSON.parse(response3)
 
     constants.quants = jsonText;
@@ -42,6 +42,7 @@ $(window).on('load', async function() {
         let hosp = sims[1]
         let mob = sims[2]
         let pow = sims[3]
+        let sco = sims[4]
 
         popChart.makeChart(popChart.quantFormatter(pop),'#pop-chart')
 
@@ -50,6 +51,12 @@ $(window).on('load', async function() {
         mobChart.makeChart(mobChart.quantFormatter(mob), '#mob-chart')
 
         powChart.makeChart(powChart.quantFormatter(pow), '#pow-chart')
+
+        // *****************************************************
+        // ** How do we want to ingegrate a school histogram? **
+        // *****************************************************
+
+        
     })
 
     // let pop = await formatSims();

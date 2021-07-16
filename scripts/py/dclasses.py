@@ -204,7 +204,7 @@ class hrefGrids(object):
 
 class ImpactGrids(object):
     def __init__(self, impacts_grids_root):
-        impacts_grids_file = impacts_grids_root.joinpath("impact-grids.npz")
+        impacts_grids_file = impacts_grids_root.joinpath("impact-grids-new.npz")
         with np.load(impacts_grids_file) as NPZ:
             self.population = NPZ["population"]
             self.proj = pyproj.Proj(NPZ["srs"].item())

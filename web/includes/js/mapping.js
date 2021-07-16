@@ -66,6 +66,7 @@ function style(feature,level) {
     let loc;
     let impact = mu.currentStatus.Impact;
     let perc = mu.currentStatus.Percentile
+    let opacity = document.getElementById('slide').value
 
     switch(level) {
         case 'National':
@@ -76,7 +77,7 @@ function style(feature,level) {
 
                 fillColor: returnColor(loc,impact,perc),
                 weight: 1,
-                fillOpacity: 0.7,
+                fillOpacity: opacity,
                 color: '#432'
         
             }
@@ -89,7 +90,7 @@ function style(feature,level) {
 
                 fillColor: returnColor(loc,impact,perc),
                 weight: 1,
-                fillOpacity: 0.7,
+                fillOpacity: opacity,
                 color: '#432'
         
             }
@@ -102,7 +103,7 @@ function style(feature,level) {
 
                 fillColor: returnColor(loc,impact,perc),
                 weight: 1,
-                fillOpacity: 0.7,
+                fillOpacity: opacity,
                 color: '#432'
         
             }
@@ -115,7 +116,7 @@ function style(feature,level) {
 
                 fillColor: returnColor(loc,impact,perc),
                 weight: 1,
-                fillOpacity: 0.7,
+                fillOpacity: opacity,
                 color: '#432'
         
             }
@@ -228,38 +229,58 @@ export function makeMap() {
 
             // Change table to national data if control layer changes to national
             map.on('baselayerchange', async function (e) {
-                if (e.layer.options.what == 'National') {
+
+                switch (e.layer.options.what) {
+                    case 'National':
+                        
+                        mu.currentStatus.Type = 'National'
+                        mu.currentStatus.Location = 'National'
+                        mu.updateTable('National')
+                        drawGrids('National');
+
+                        // Need update of impacts box
+                        let dm = dataManager.Manager();
+                        let response = await dm.readJson('../data/output/examples/jsonResponse_sims_newnat.json')
+                        let jsonText = JSON.parse(response)
+
+                        constants.sims = jsonText
+                        
+                        // Update Points
+                        updatePoints('pop');
+                        updatePoints('hosp');
+                        updatePoints('mob');
+                        updatePoints('pow');
+                        updatePoints('sco');
+
+                        Promise.all(formatSims()).then(sims => {
+
+                            let pop = sims[0]
+                            let hosp = sims[1]
+                            let mob = sims[2]
+                            let pow = sims[3]
+                            let sco = sims[4]
                     
-                    mu.currentStatus.Type = 'National'
-                    mu.currentStatus.Location = 'National'
-                    mu.updateTable('National')
-                    drawGrids('National');
+                            popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
+                            hospChart.updateChart(hospChart.quantFormatter(hosp), '#hosp-chart')
+                            mobChart.updateChart(mobChart.quantFormatter(mob), '#mob-chart')
+                            powChart.updateChart(powChart.quantFormatter(pow), '#pow-chart')
+                        })
 
-                    // Need update of impacts box
-                    let dm = dataManager.Manager();
-                    let response = await dm.readJson('../data/output/examples/jsonResponse_sims.json')
-                    let jsonText = JSON.parse(response)
+                        break;
+                    case 'State':
 
-                    constants.sims = jsonText
-                    
-                    // Update Points
-                    updatePoints('pop');
-                    updatePoints('hosp');
-                    updatePoints('mob');
-                    updatePoints('pow');
+                        mu.currentStatus.Type = 'State'
+                        break;
 
-                    Promise.all(formatSims()).then(sims => {
+                    case 'CWA':
 
-                        let pop = sims[0]
-                        let hosp = sims[1]
-                        let mob = sims[2]
-                        let pow = sims[3]
-                
-                        popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
-                        hospChart.updateChart(hospChart.quantFormatter(hosp), '#hosp-chart')
-                        mobChart.updateChart(mobChart.quantFormatter(mob), '#mob-chart')
-                        powChart.updateChart(powChart.quantFormatter(pow), '#pow-chart')
-                    })
+                        mu.currentStatus.Type = 'CWA'
+                        break;
+
+                    case 'FEMA':
+
+                        mu.currentStatus.Type = 'FEMA'
+                        break;
 
                 }
             })
@@ -271,6 +292,44 @@ export function makeMap() {
                 statesLayer.setStyle({fillOpacity: this.value})
                 cwasLayer.setStyle({fillOpacity: this.value})
                 femaLayer.setStyle({fillOpacity: this.value})
+            }
+
+            let prod = document.getElementById('prod')
+            prod.onchange = function() {
+                mu.currentStatus.Impact = constants.impDict[prod.value];
+
+                info.update();
+                
+                natLayer.setStyle(function(feature){
+                    return style(feature,'National')
+                })
+                statesLayer.setStyle(function(feature){
+                    return style(feature,'State')
+                })
+                cwasLayer.setStyle(function(feature){
+                    return style(feature,'CWA')
+                })
+                femaLayer.setStyle(function(feature){
+                    return style(feature,'FEMA')
+                })
+            }
+
+            let perc = document.getElementById('perc')
+            perc.onchange = function() {
+                mu.currentStatus.Percentile = perc.value;
+
+                natLayer.setStyle(function(feature){
+                    return style(feature,'National')
+                })
+                statesLayer.setStyle(function(feature){
+                    return style(feature,'State')
+                })
+                cwasLayer.setStyle(function(feature){
+                    return style(feature,'CWA')
+                })
+                femaLayer.setStyle(function(feature){
+                    return style(feature,'FEMA')
+                })
             }
 
             info.onAdd = function(map) {
@@ -286,7 +345,22 @@ export function makeMap() {
 
                 try {
                     // Need a switch (or something similar) here for area type
-                    loc = locCodes[props.NAME];
+                    switch (mu.currentStatus.Type) {
+
+                        case 'State':
+                            loc = locCodes[props.NAME];
+                            break;
+
+                        case 'CWA':
+                            loc = props.CWA;
+                            break;
+                        
+                        case 'FEMA':
+                            loc = props.region;
+                            break;
+
+                    }
+
                 } catch (err) {
 
                 }

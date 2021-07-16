@@ -82,16 +82,17 @@
                             <option value="hosp">Hospitals</option>
                             <option value="mob">Mobile Homes</option>
                             <option value="pow">Power Substations</option>
+                            <option value="sco">Schools</option>
                         </select>
                     </div>
                   </li>
                   <li class='nav-item py-1 px-lg-2'>
                     <div class="optionbox" id="map-fill">
-                        <span class="style5">Quantile Fill</span><br/>
+                        <span class="style5">Percentile Fill</span><br/>
                         <select id="perc">
-                            <option value="ten">10th Percentile</option>
-                            <option value="med" selected>Median</option>
-                            <option value="ninety">90th Percentile</option>
+                            <option value="0.1">10th Percentile</option>
+                            <option value="0.5" selected>Median</option>
+                            <option value="0.9">90th Percentile</option>
                         </select>
                     </div>
                   </li>
@@ -182,7 +183,7 @@
                         <th scope="col" class='ttor cell'>Tornadoes</th>
                         <th scope="col" class='tpop cell'>Population</th>
                         <th scope="col" class='thosp cell'>Hospitals</th>
-                        <!-- <th scope="col" class='tsco cell'>Schools</th> -->
+                        <th scope="col" class='tsco cell'>Schools</th>
                         <th scope="col" class='tmob cell'>Mobile Homes</th>
                         <th scope="col" class='tpow cell'>Power Substations</th>
                       </tr>
@@ -202,7 +203,7 @@
                             <td class='ttornadoes cell ten dat' data-toggle="tooltip"></td>
                             <td class='tpopulation cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
                             <td class='thospitals cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
-                            <!-- <td class='tschools cell ten dat' data-toggle="tooltip" title="Climo goes here"></td> -->
+                            <td class='tschools cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
                             <td class='tmobilehomes cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
                             <td class='tpsubstations cell ten dat' data-toggle="tooltip" title="Climo goes here"></td>
                         </tr>
@@ -211,7 +212,7 @@
                         <td class='ttornadoes cell med dat' data-toggle="tooltip"></td>
                         <td class='tpopulation cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='thospitals cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
-                        <!-- <td class='tschools cell med dat' data-toggle="tooltip" title="Climo goes here"></td> -->
+                        <td class='tschools cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='tmobilehomes cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='tpsubstations cell med dat' data-toggle="tooltip" title="Climo goes here"></td>
                       </tr>
@@ -220,7 +221,7 @@
                         <td class='ttornadoes cell ninety dat' data-toggle="tooltip"></td>
                         <td class='tpopulation cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='thospitals cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
-                        <!-- <td class='tschools cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td> -->
+                        <td class='tschools cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='tmobilehomes cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
                         <td class='tpsubstations cell ninety dat' data-toggle="tooltip" title="Climo goes here"></td>
                       </tr>
@@ -272,25 +273,33 @@
         <div class="row">
             <!-- <div id='dist-holder' class='col-6'> -->
                 <h3 id="prob-dist-title" class='col-12'>Tornado Impact Distributions (National)</h3>
-                <div class='col-lg-3'><h4>Population</h4></div>
-                <div class='col-lg-3'><h4>Hospitals</h4></div>
-                <div class='col-lg-3'><h4>Mobile Homes</h4></div>
-                <div class='col-lg-3'><h4>Power Substations</h4></div>
+                <div class='col-lg-3'>
+                  <h4>Population</h4>
+                </div>
+                <div class='col-lg-3'>
+                  <h4>Hospitals</h4>
+                </div>
+                <div class='col-lg-3'>
+                  <h4>Mobile Homes</h4>
+                </div>
+                <div class='col-lg-3'>
+                  <h4>Power Substations</h4>
+                </div>
                 
                 <div id='pop-chart' class='col-lg-3 chart'>
-                  <!-- <h4>Hospitals</h4> -->
+                  <div class='no-tor'>No simulated tornadoes (or no file)</div>
                 </div>
 
                 <div id='hosp-chart' class='col-lg-3 chart'>
-                    <!-- <h4>Hospitals</h4> -->
+                  <div class='no-tor'>No simulated tornadoes (or no file)</div>
                 </div>
 
                 <div id='mob-chart' class='col-lg-3 chart'>
-                    <!-- <h4>Mobile Homes</h4> -->
+                  <div class='no-tor'>No simulated tornadoes (or no file)</div>
                 </div>
 
                 <div id='pow-chart' class='col-lg-3 chart'>
-                    <!-- <h4>Power Substations</h4> -->
+                  <div class='no-tor'>No simulated tornadoes (or no file)</div>
                 </div>
 
             <!-- </div> -->
