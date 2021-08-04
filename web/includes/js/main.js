@@ -7,8 +7,6 @@ import {popChart,hospChart,mobChart,powChart} from './hist.js'
 
 // for ( let i = 1; i < constants.nsims + 1; i++) { constants.sim_range.push(i) }
 var dm, du;
-// var popChart = new histogram(), hospChart = new histogram(), mobChart = new histogram(),
-//                     powChart = new histogram();
 
 $(window).on('load', async function() {
 
@@ -17,13 +15,13 @@ $(window).on('load', async function() {
 
     // * Currently an example file *
     // * Reading from a regular json
-    let response = await dm.readJson('../data/output/examples/jsonResponse_schoolsfema.json')
+    let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_schoolsfema.json`)
     let jsonText = JSON.parse(response)
 
-    let response2 = await dm.readJson('../data/output/examples/jsonResponse_time_sum_schoolsfema.json')
+    let response2 = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_time_sum_schoolsfema.json`)
     let jsonText2 = JSON.parse(response2)
 
-    let response3 = await dm.readJson('../data/output/examples/jsonResponse_sims_newnat.json')
+    let response3 = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_sims_newnat.json`)
     let jsonText3 = JSON.parse(response3)
 
     constants.quants = jsonText;

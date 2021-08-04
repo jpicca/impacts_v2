@@ -85,6 +85,9 @@ export default function module() {
         // - Update hist charts title
 
         exports.currentStatus.Type = exports.whichLevel(loc);
+        // console.log('loc change')
+        // console.log(exports.currentStatus.Type)
+
         exports.currentStatus.Location = loc;
 
         let title = document.getElementById('prob-dist-title')
@@ -99,9 +102,10 @@ export default function module() {
 
         // Update Impacts scatter
         // Need to first read in new set of sims
-        if (loc == 'TX') {
+        // if (loc == 'TX') {
+        if (exports.currentStatus.Type == 'State') {
 
-            let response = await dm.readJson('../data/output/examples/jsonResponse_sims_newTX.json')
+            let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_sims_${loc}.json`)
             let jsonText = JSON.parse(response)
 
             constants.sims = jsonText
@@ -130,9 +134,9 @@ export default function module() {
                 powChart.updateChart(powChart.quantFormatter(pow),'#pow-chart')
 
             })
-        } else if (loc == '6') {
+        } else if (exports.currentStatus.Type == 'FEMA') {
 
-            let response = await dm.readJson('../data/output/examples/jsonResponse_sims_6.json')
+            let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_sims_${loc}.json`)
             let jsonText = JSON.parse(response)
 
             constants.sims = jsonText
@@ -164,23 +168,56 @@ export default function module() {
 
         } else {
 
-            console.log('Only TX & FEMA 6 update the impacts scatter right now!')
-            console.log('Need to figure out how sims data will be delivered from backend...')
-            console.log('i.e., from API or from post-processed jsons/csvs')
+            let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_sims_${loc}.json`)
+            let jsonText = JSON.parse(response)
 
-            // Set it to make tor ratings go to 0 and hists disappear
-            constants.sims = []
+            constants.sims = jsonText
+            
+            // Update Points
             updatePoints('pop');
             updatePoints('hosp');
             updatePoints('mob');
             updatePoints('pow');
             updatePoints('sco');
 
-            // Hide the distributions
-            adjustDist();
+            // Update histograms
+            Promise.all(formatSims()).then(sims => {
+
+                let pop = sims[0]
+                let hosp = sims[1]
+                let mob = sims[2]
+                let pow = sims[3]
+                let sco = sims[4]
+
+                title.innerText = `Tornado Impact Distributions (${loc})`
+
+                popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
+                hospChart.updateChart(hospChart.quantFormatter(hosp),'#hosp-chart')
+                mobChart.updateChart(mobChart.quantFormatter(mob),'#mob-chart')
+                powChart.updateChart(powChart.quantFormatter(pow),'#pow-chart')
+
+            });
+
+
+            // console.log('Only TX & FEMA 6 update the impacts scatter right now!')
+            // console.log('Need to figure out how sims data will be delivered from backend...')
+            // console.log('i.e., from API or from post-processed jsons/csvs')
+
+            // // Set it to make tor ratings go to 0 and hists disappear
+            // constants.sims = []
+            // updatePoints('pop');
+            // updatePoints('hosp');
+            // updatePoints('mob');
+            // updatePoints('pow');
+            // updatePoints('sco');
+
+            // // Hide the distributions
+            // adjustDist();
 
         }
         
+        // console.log('end of update')
+        // console.log(exports.currentStatus.Type)
 
     }
 

@@ -44,10 +44,13 @@ var map, natLayer, statesLayer, cwasLayer, femaLayer, torLayer, control, info;
 function getFeatureData(loc,impact,perc,type='Current') {
 
     let filtered = constants.quants.filter(entry => entry.Location == loc);
+    // console.log(constants.quants)
+    // console.log(loc)
 
     try {
         return filtered[0][type][impact][perc];
     } catch (err) {
+        // console.log(err)
         return 0
     }
 
@@ -230,6 +233,8 @@ export function makeMap() {
             // Change table to national data if control layer changes to national
             map.on('baselayerchange', async function (e) {
 
+                // console.log('base layer change!')
+
                 switch (e.layer.options.what) {
                     case 'National':
                         
@@ -240,7 +245,7 @@ export function makeMap() {
 
                         // Need update of impacts box
                         let dm = dataManager.Manager();
-                        let response = await dm.readJson('../data/output/examples/jsonResponse_sims_newnat.json')
+                        let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_sims_newnat.json`)
                         let jsonText = JSON.parse(response)
 
                         constants.sims = jsonText
@@ -251,6 +256,10 @@ export function makeMap() {
                         updatePoints('mob');
                         updatePoints('pow');
                         updatePoints('sco');
+
+
+                        let title = document.getElementById('prob-dist-title')
+                        title.innerText = 'Tornado Impact Distributions (National)'
 
                         Promise.all(formatSims()).then(sims => {
 
@@ -342,6 +351,8 @@ export function makeMap() {
                 let loc;
                 let impact = mu.currentStatus.Impact;
                 let perc = mu.currentStatus.Percentile
+                // console.log('update')
+                // console.log(mu.currentStatus.Type)
 
                 try {
                     // Need a switch (or something similar) here for area type
@@ -387,6 +398,8 @@ function onEachFeature(feature, layer) {
 function highlightFeature(e) {
     var layer = e.target;
 
+    // console.log(layer.feature.properties)
+
     info.update(layer.feature.properties)
     layer.setStyle({
         weight: 5
@@ -412,6 +425,9 @@ function resetHighlight(e) {
 function selectFeature(e) {
     map.fitBounds(e.target.getBounds());
     let loc;
+
+    // console.log('select Feature')
+    // console.log(mu.currentStatus)
 
     // *** need to grab checked radio button value
     // State

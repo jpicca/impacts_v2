@@ -13,7 +13,9 @@ var constants = {
         'sco': 'schools'
     },
     height: $(window).height(),
-    width: $(window).width()
+    width: $(window).width(),
+    date: 20110427
+    // date: '20210428'
 }
 
 //              //
@@ -24,29 +26,29 @@ export const customReds = d3.scaleLinear().range(["rgb(255,245,240)", "rgb(214,3
 
 export const fillColorDict = {
     'population': {
-        '0.1': d3.scaleSequential([1,100], customReds),
-        '0.5': d3.scaleSequential([1,1000], customReds),
-        '0.9': d3.scaleSequential([1,10000], customReds)
+        '0.1': d3.scaleSequential([0,1000], customReds),
+        '0.5': d3.scaleSequential([0,10000], customReds),
+        '0.9': d3.scaleSequential([0,100000], customReds)
     },
     'hospitals': {
-        '0.1': d3.scaleSequential([1,2], customReds),
-        '0.5': d3.scaleSequential([1,3], customReds),
-        '0.9': d3.scaleSequential([1,5], customReds)
+        '0.1': d3.scaleSequential([0,1], customReds),
+        '0.5': d3.scaleSequential([0,2], customReds),
+        '0.9': d3.scaleSequential([0,5], customReds)
     },
     'psubstations': {
-        '0.1': d3.scaleSequential([1,3], customReds),
-        '0.5': d3.scaleSequential([1,5], customReds),
-        '0.9': d3.scaleSequential([1,10], customReds)
+        '0.1': d3.scaleSequential([0,3], customReds),
+        '0.5': d3.scaleSequential([0,5], customReds),
+        '0.9': d3.scaleSequential([0,10], customReds)
     },
     'mobilehomes': {
-        '0.1': d3.scaleSequential([1,50], customReds),
-        '0.5': d3.scaleSequential([1,100], customReds),
-        '0.9': d3.scaleSequential([1,250], customReds)
+        '0.1': d3.scaleSequential([0,50], customReds),
+        '0.5': d3.scaleSequential([0,100], customReds),
+        '0.9': d3.scaleSequential([0,250], customReds)
     },
     'schools': {
-        '0.1': d3.scaleSequential([1,3], customReds),
-        '0.5': d3.scaleSequential([1,5], customReds),
-        '0.9': d3.scaleSequential([1,50], customReds)
+        '0.1': d3.scaleSequential([0,3], customReds),
+        '0.5': d3.scaleSequential([0,5], customReds),
+        '0.9': d3.scaleSequential([0,50], customReds)
     }
 }
 
