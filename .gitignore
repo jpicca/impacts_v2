@@ -1,4 +1,14 @@
 notebooks/assets/
 notebooks/NWA-assets/
+notebooks/__pycache__/
+notebooks/dask-worker-space/
+notebooks/feb22-forecastertraining/
+notebooks/.ipynb_checkpoints/
+notebooks/
 
 data/output/examples/
+data/cur-data/
+
+scripts/dask-wiorker-space
+scripts/py/deprecated
+scripts/py/__pycache__

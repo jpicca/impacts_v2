@@ -5,7 +5,7 @@ RUN_TIME=$1
 CURRENT_DATE=`date -u +"%Y%m%d"`
 NOMADS="https://nomads.ncep.noaa.gov/pub/data/nccf/com/spc_post/prod/spc_post."${CURRENT_DATE}"/severe/"
 WGET="/usr/local/bin/wget"
-OUTDIR="/Users/josephpicca/projects/impacts/v2/cur-data/href/"
+OUTDIR="/Users/josephpicca/projects/impacts/v3/cur-data/href/"
 
 # Determine which ftimes to download
 if [[ "$RUN_TIME" -eq "00" ]]

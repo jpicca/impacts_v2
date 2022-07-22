@@ -8,7 +8,7 @@ from skimage import measure
 
 from pygridder import pygridder as pgrid
 
-path_root = '/Users/josephpicca/projects/impacts/dev/impacts-app/scripts/'
+path_root = '/Users/josephpicca/projects/impacts/v3/scripts/'
 
 
 _fips2state = {'01': 'AL', '04': 'AZ', '05': 'AR', '06': 'CA', '08': 'CO', '09': 'CT', '10': 'DE',
@@ -21,7 +21,7 @@ _fips2state = {'01': 'AL', '04': 'AZ', '05': 'AR', '06': 'CA', '08': 'CO', '09':
 
 _synthetic_tornado_fields = ["population", "distance", "rating", "states", 
         "counties", "wfos", "hospitals", "hospitalbeds", "mobileparks", 
-        "mobilehomes", "psubstations", "plines", "slon", "slat", "elon", "elat"]
+        "mobilehomes", "psubstations", "plines", "schools", "slon", "slat", "elon", "elat"]
 
 class TornadoDistributions(object):
     def __init__(self):
@@ -34,8 +34,13 @@ class TornadoDistributions(object):
 
         # Tornado Rating Distributions
         self.r_nonsig = np.array([0.653056, 0.269221, 0.058293, 0.016052, 0.003378, 0])
-        self.r_singlesig = np.array([0.460559, 0.381954, 0.119476, 0.031184, 0.006273, 0.000554])
-        self.r_doublesig = np.array([0.3003, 0.363363, 0.168168, 0.09009, 0.063063, 0.015016])
+        
+        ## !!!!! Change back to normal double sig when done with NWA slides !!!! ##
+        self.r_singlesig = np.array([0.653056, 0.269221, 0.058293, 0.016052, 0.003378, 0])
+        self.r_doublesig = np.array([0.653056, 0.269221, 0.058293, 0.016052, 0.003378, 0])
+        
+        #self.r_singlesig = np.array([0.460559, 0.381954, 0.119476, 0.031184, 0.006273, 0.000554])
+#         self.r_doublesig = np.array([0.3003, 0.363363, 0.168168, 0.09009, 0.063063, 0.015016])
 
         self.r_notorn = np.array([0.764045, 0.196629, 0.033708, 0.005618, 0, 0])
         # Experimental Triple Sig using rating dists from 27apr2011,11apr1965,3apr1974,
@@ -57,7 +62,7 @@ class TornadoDistributions(object):
 
 class ImpactGrids(object):
     def __init__(self, impacts_grids_root):
-        impacts_grids_file = impacts_grids_root.joinpath("impact-grids.npz")
+        impacts_grids_file = impacts_grids_root.joinpath("impact-grids-new.npz")
         with np.load(impacts_grids_file) as NPZ:
             self.population = NPZ["population"]
             self.proj = pyproj.Proj(NPZ["srs"].item())
@@ -75,7 +80,7 @@ class ImpactGrids(object):
             
             # Workaround for loading the corrected wfo file, while keeping from having projection errors (still unsure why these happen with pyproj)
             #self.wfo = NPZ["wfo"]
-            self.wfo = np.load(pathlib.Path(f'{path_root}impacts-data/pas-input-data/cwas.npz'))['cwas']
+            self.wfo = np.load(pathlib.Path(f'{path_root}pas-input-data/cwas.npz'))['cwas']
             self.hospitals = NPZ["hospitals"]
             self.hospitalbeds = NPZ["hbeds"]
             self.mobilehomes = NPZ["mhomes"]
@@ -94,7 +99,7 @@ class ImpactGrids(object):
 
 class SyntheticTornado(object):
     def __init__(self, slon, slat, elon, elat, population, distance, rating, states, counties, wfos, hospitals,
-                 hospitalbeds, mobileparks, mobilehomes, psubstations, plines, loc_precision=4):
+                 hospitalbeds, mobileparks, mobilehomes, psubstations, plines, schools, loc_precision=4):
         self.slon = round(slon, loc_precision)
         self.slat = round(slat, loc_precision)
         self.elon = round(elon, loc_precision)
@@ -111,6 +116,7 @@ class SyntheticTornado(object):
         self.mobilehomes = mobilehomes
         self.psubstations = psubstations
         self.plines = plines
+        self.schools = schools
 
     @property
     def headers(self):
@@ -144,6 +150,7 @@ class SyntheticTornadoRealization(object):
         self.mobilehomes = sum(s.mobilehomes for s in self.tornadoes)
         self.psubstations = sum(s.psubstations for s in self.tornadoes)
         self.plines = sum(s.plines for s in self.tornadoes)
+        self.schools = sum(s.schools for s in self.tornadoes)
 
     @property
     def __geo_interface__(self):
@@ -208,7 +215,7 @@ def simulate(inds, dists, ratings, direction, igrids):
                                  igrids.hospitalbeds[idx].sum()),
                              int(igrids.mobileparks[idx].sum()), int(
                                  igrids.mobilehomes[idx].sum()),
-                             int(igrids.psubstations[idx].sum()), int(igrids.plines[idx].sum()))
+                             int(igrids.psubstations[idx].sum()), int(igrids.plines[idx].sum()),int(igrids.schools[idx].sum()))
             for i, idx in enumerate(idxs)]
 
 

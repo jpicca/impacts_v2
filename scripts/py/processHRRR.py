@@ -28,7 +28,7 @@ hrrr_path = args.path
 
 # Global vars
 names = ['Pressure','Geopotential Height','U component of wind','V component of wind']
-files = sorted(glob(hrrr_path))
+files = sorted(glob(f'{hrrr_path}/*'))
 
 # Function to pull needed variables
 def pullVar(file,var):
@@ -67,4 +67,4 @@ for file in files:
     
 varGrid = xr.concat(merged_list,dim='step')
 
-varGrid.to_netcdf('../cur-data/hrrr-stack/stack4d.nc')
+varGrid.to_netcdf(f'{hrrr_path}/../hrrr-stack/stack4d.nc')

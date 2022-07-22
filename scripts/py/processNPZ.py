@@ -27,8 +27,8 @@ args = parser.parse_args()
 ### Parse CLI Arguments ###
 otlk_day = args.day
 ndfd_file = pathlib.Path(args.path,'orig-gis-data','ndfd.npz')
-zip_dir = pathlib.Path(args.path, '..','..','cur-data','outlooks-shp')
-outdir = pathlib.Path(args.path, '..','..','cur-data','outlooks-npz')
+zip_dir = pathlib.Path(args.path, '..','..','data','cur-data','outlooks-shp')
+outdir = pathlib.Path(args.path, '..','..','data','cur-data','outlooks-npz')
 
 # load the ndfd file
 with np.load(ndfd_file) as NPZ:
@@ -140,7 +140,7 @@ for haz in hazards.keys():
 # get the timestamp of the outlook
 if not args.nogeo:
 
-    geofile = pathlib.Path(args.path, '..','..','cur-data','geojson',f'day{otlk_day}.geojson')
+    geofile = pathlib.Path(args.path, '..','..','data','cur-data','geojson',f'day{otlk_day}.geojson')
     with open(geofile,'r') as f:
         outjs = json.load(StringIO(f.read()))
 

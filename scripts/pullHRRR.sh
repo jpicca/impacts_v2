@@ -5,11 +5,11 @@ RUN_TIME=$1
 CURRENT_DATE=`date -u +"%Y%m%d"`
 NOMADS="https://nomads.ncep.noaa.gov/pub/data/nccf/com/hrrr/prod/hrrr."${CURRENT_DATE}"/conus/"
 WGET="/usr/local/bin/wget"
-OUTDIR="/Users/josephpicca/projects/impacts/v2/cur-data/hrrr/"
+OUTDIR="/Users/josephpicca/projects/impacts/v3/data/cur-data/hrrr/"
 PYTHON_UTIL="/Users/josephpicca/opt/anaconda3/envs/impacts-ml/bin/python"
 MPI="/Users/josephpicca/opt/anaconda3/envs/impacts-ml/bin/mpirun"
-DIR_ROOT="/Users/josephpicca/projects/impacts/v2"
-CURDATA_DIR="/cur-data"
+DIR_ROOT="/Users/josephpicca/projects/impacts/v3"
+CURDATA_DIR="/data/cur-data"
 SCRIPT_DIR="/scripts"
 
 # Determine which ftimes to download
@@ -35,4 +35,4 @@ do
 done
 
 # Spin up a dask cluster & run script
-$MPI -np 6 $PYTHON_UTIL $DIR_ROOT$SCRIPT_DIR"/py/processHRRR.py" -p $DIR_ROOT$CURDATA_DIR"/hrrr/*"
+$MPI -np 6 $PYTHON_UTIL $DIR_ROOT$SCRIPT_DIR"/py/processHRRR.py" -p $DIR_ROOT$CURDATA_DIR"/hrrr"
