@@ -9,6 +9,12 @@ notebooks/
 data/output/examples/
 data/cur-data/
 
-scripts/dask-wiorker-space
+scripts/dask-worker-space
 scripts/py/deprecated
 scripts/py/__pycache__
+scripts/py/log
+scripts/impacts-data/output
+
+dask-worker-space
+
+web/includes/data

@@ -250,57 +250,76 @@
                 <!-- <a href='../info-tor.html' target="_blank">Model Details</a> -->
 
                 <!-- <hr> -->
-                <div class='row'>
-                  <div id='matrix-holder' class='col-lg-7'>
-                    Time Matrix
-                  </div>
-                  <div id='rating-holder' class='col-lg-3'>
-                    By Tornado Rating
-                  </div>
-                  <div id="threshold-holder" class="col-lg-2">
-                    Thresholds
-                    <!-- <span>Sliders for each impact</span> -->
-                  </div>
-                </div>
+                
                 <!-- <h5>Expected Severe Hail & Damaging Wind Reports</h5>
                 <span class="lead" id="exp-hail" data-toggle="tooltip" title="Climo: Select a Valid CWA">Hail: Select a Valid CWA</span><br>
                 <span class="lead" id="exp-wind" data-toggle="tooltip" title="Climo: Select a Valid CWA">Wind: Select a Valid CWA</span><br>
 
                 <a href='../info-reports.html' target="_blank">Model Details</a> -->
-            </div>
+          </div>
             
         </div>
-        <div class="row">
+        <div class='row'>
+          <div id='matrix-holder' class='col-lg-7'>
+            Injury/Fatality Prediction (like ml page)
+          </div>
+          <div id='rating-holder' class='col-lg-5'>
+            Horizontal chart (like ml chart) but with hours of casualties
+          </div>
+          <!-- <div id="threshold-holder" class="col-lg-2">
+            Thresholds
+            <span>Sliders for each impact</span>
+          </div> -->
+        </div>
+        <div class="row" id="hists">
             <!-- <div id='dist-holder' class='col-6'> -->
                 <h3 id="prob-dist-title" class='col-12'>Tornado Impact Distributions (National)</h3>
-                <div class='col-lg-3'>
+                <div class='col-lg-2'>
                   <h4>Population</h4>
+                  <div id='pop-chart' class='chart'>
+                    <div class='no-tor'>No simulated tornadoes</div>
+                  </div>
                 </div>
-                <div class='col-lg-3'>
+                <div class='col-lg-2'>
                   <h4>Hospitals</h4>
+                  <div id='hosp-chart' class='chart'>
+                    <div class='no-tor'>No simulated tornadoes</div>
+                  </div>
                 </div>
-                <div class='col-lg-3'>
+                <div class='col-lg-2'>
                   <h4>Mobile Homes</h4>
+                  <div id='mob-chart' class='chart'>
+                    <div class='no-tor'>No simulated tornadoes</div>
+                  </div>
                 </div>
-                <div class='col-lg-3'>
+                <div class='col-lg-2'>
                   <h4>Power Substations</h4>
+                  <div id='pow-chart' class='chart'>
+                    <div class='no-tor'>No simulated tornadoes</div>
+                  </div>
+                </div>
+                <div class='col-lg-2'>
+                  <h4>Schools</h4>
+                  <div id='sco-chart' class='chart'>
+                    <div class='no-tor'>No simulated tornadoes</div>
+                  </div>
                 </div>
                 
-                <div id='pop-chart' class='col-lg-3 chart'>
+                <!-- <div id='pop-chart' class='col-lg-3 chart'>
                   <div class='no-tor'>No simulated tornadoes (or no file)</div>
-                </div>
+                </div> -->
 
-                <div id='hosp-chart' class='col-lg-3 chart'>
+                <!-- <div id='hosp-chart' class='col-lg-3 chart'>
                   <div class='no-tor'>No simulated tornadoes (or no file)</div>
-                </div>
+                </div> -->
 
-                <div id='mob-chart' class='col-lg-3 chart'>
+                <!-- <div id='mob-chart' class='col-lg-3 chart'>
                   <div class='no-tor'>No simulated tornadoes (or no file)</div>
-                </div>
+                </div> -->
 
-                <div id='pow-chart' class='col-lg-3 chart'>
+                <!-- <div id='pow-chart' class='col-lg-3 chart'>
                   <div class='no-tor'>No simulated tornadoes (or no file)</div>
-                </div>
+                </div> -->
 
             <!-- </div> -->
         </div>

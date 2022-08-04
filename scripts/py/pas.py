@@ -3,6 +3,10 @@ import datetime
 import gzip
 import pathlib
 from os import environ as E
+import os
+# from poplib import POP3_PORT
+from log import pasLogger
+import sys
 
 import geojson
 import numpy as np
@@ -74,6 +78,8 @@ def read_ndfd_grib_file(grbfile):
         except AttributeError:
             vals = GRB[1].values
     return vals
+
+
 
 # Set up out path/file
 #outfile = outdir.joinpath('sims.psv.gz')

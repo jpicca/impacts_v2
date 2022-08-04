@@ -13,13 +13,24 @@ CURDATA_DIR="/data/cur-data"
 SCRIPT_DIR="/scripts"
 
 # Determine which ftimes to download
+# if [[ "$RUN_TIME" -eq "00" ]]
+# then
+#     echo "Using 00z f times"
+#     F_TIMES=(12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35)
+# else
+#     echo "Using 12z f times"
+#     F_TIMES=(00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23)
+# fi
+
+# New pull -- just getting 3-hourly forecasts (ease the processing load and lose very little in precision for PAS purposes)
+# ** NEED TO REMEMBER -- LOGIC IN PAS MUST BE CHANGED TO ACCOMODATE LESS GRANULAR TIME DIMENSION **
 if [[ "$RUN_TIME" -eq "00" ]]
 then
     echo "Using 00z f times"
-    F_TIMES=(12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35)
+    F_TIMES=(12 15 18 21 24 27 30 33)
 else
     echo "Using 12z f times"
-    F_TIMES=(00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23)
+    F_TIMES=(00 03 06 09 12 15 18 21)
 fi
 
 # Remove old files to make sure we're not running PAS on old HREF data

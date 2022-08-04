@@ -28,6 +28,20 @@ dataManager.Manager = function module() {
 
     };
 
+    exports.readCsv = function(file) {
+
+        return new Promise((resolve,reject) => {
+
+            d3.csv(file).then(data => {
+                // Resolve the promise and return the file data
+                resolve(data)
+            }).catch(err => {
+                // Reject the promise if no file and return the error
+                reject(err)
+            })
+        })
+    }
+
     // Reading from db
     // ** put function here **
 

@@ -4,6 +4,8 @@ body {
 
 #map-holder {
     overflow: hidden;
+    /* height: 300px; */
+    min-height: 250px;
 }
 
 #contentwrapper {
@@ -35,7 +37,7 @@ body {
 }
 
 table {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 }
 
 .tor-paths {
@@ -64,4 +66,8 @@ table {
     position: absolute;
     width: 100%;
     visibility: hidden;
+}
+
+.row#hists {
+    justify-content: center;
 }

@@ -2,34 +2,35 @@
 import update from './update.js'
 import {locCodes} from './const.js'
 import constants from './const.js'
-import {fillColorDict} from './const.js'
+import {fillColorDict, fillColor} from './const.js'
 import { drawGrids, updatePoints } from './time-matrix.js'
-import {popChart,hospChart,mobChart,powChart,formatSims} from './hist.js'
+import {popChart,hospChart,mobChart,powChart,scoChart,formatSims} from './hist.js'
 
 const path_pre = './includes/geo/'
 
-var stateMap = d3.json(`${path_pre}states.json`)
+var stateMap = d3.json(`${constants.geodataroot}states.json`)
     .then(function(files) {
         return files;
     })
 
-var cwaMap = d3.json(`${path_pre}cwas.json`)
+var cwaMap = d3.json(`${constants.geodataroot}cwas.json`)
     .then(function(files) {
         return files;
     })
 
-var femaMap = d3.json(`${path_pre}FemaRegions_fixed.json`)
+var femaMap = d3.json(`${constants.geodataroot}FemaRegions_fixed.json`)
     .then(function(files) {
         return files;
     })
 
-var torMap = d3.json(`${path_pre}day1_torn.geojson`)
+var torMap = d3.json(`${constants.geodataroot}day1_torn.geojson`)
     .then(function(files) {
         return files;
     })
 
 var mapData = [stateMap, cwaMap, femaMap, torMap]
 var mu = update();
+var dm = dataManager.Manager();
 
 // // Initialize leaflet map
 var map, natLayer, statesLayer, cwasLayer, femaLayer, torLayer, control, info;
@@ -48,19 +49,21 @@ function getFeatureData(loc,impact,perc,type='Current') {
     // console.log(loc)
 
     try {
-        return filtered[0][type][impact][perc];
+        return filtered[0][type][mu.currentStatus.Tornadoes][impact][perc];
     } catch (err) {
-        // console.log(err)
         return 0
     }
 
 }
 
-function returnColor(loc,impact,perc,type='Current') {
+function returnColor(loc,impact,perc,level='State',type='Current') {
 
     let data = getFeatureData(loc,impact,perc,type='Current');
+    let colorCurve = fillColor(impact,perc,level);
 
-    return fillColorDict[impact][perc](data)
+    return colorCurve(data);
+
+    // return fillColorDict[impact][perc](data)
 
 }
 
@@ -104,7 +107,7 @@ function style(feature,level) {
 
             return {
 
-                fillColor: returnColor(loc,impact,perc),
+                fillColor: returnColor(loc,impact,perc,level),
                 weight: 1,
                 fillOpacity: opacity,
                 color: '#432'
@@ -117,7 +120,7 @@ function style(feature,level) {
 
             return {
 
-                fillColor: returnColor(loc,impact,perc),
+                fillColor: returnColor(loc,impact,perc,level),
                 weight: 1,
                 fillOpacity: opacity,
                 color: '#432'
@@ -233,62 +236,84 @@ export function makeMap() {
             // Change table to national data if control layer changes to national
             map.on('baselayerchange', async function (e) {
 
-                // console.log('base layer change!')
+                let levelstr = constants.ratDict[mu.currentStatus.Tornadoes]
 
                 switch (e.layer.options.what) {
                     case 'National':
                         
                         mu.currentStatus.Type = 'National'
                         mu.currentStatus.Location = 'National'
-                        mu.updateTable('National')
-                        drawGrids('National');
+                        // mu.updateTable('National')
 
-                        // Need update of impacts box
-                        let dm = dataManager.Manager();
-                        let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_sims_newnat.json`)
-                        let jsonText = JSON.parse(response)
+                        // let title = document.getElementById('prob-dist-title')
+                        // title.innerText = 'Tornado Impact Distributions (National)'
 
-                        constants.sims = jsonText
+                        updateAll();
+
+                        // let response = await dm.readCsv(`${constants.simdataroot}followup/sims_national_${levelstr}.csv`)
+                        // constants.newsims = response
+                        // // let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_sims_newnat.json`)
                         
-                        // Update Points
-                        updatePoints('pop');
-                        updatePoints('hosp');
-                        updatePoints('mob');
-                        updatePoints('pow');
-                        updatePoints('sco');
+                        // // console.log(response)
+                        // // let jsonText = JSON.parse(response)
 
+                        // // constants.sims = jsonText
+                        
+                        
+                        // // Update Points
+                        // // updatePoints('pop');
+                        // // updatePoints('hosp');
+                        // // updatePoints('mob');
+                        // // updatePoints('pow');
+                        // // updatePoints('sco');
 
-                        let title = document.getElementById('prob-dist-title')
-                        title.innerText = 'Tornado Impact Distributions (National)'
+                        // Promise.all(formatSims()).then(sims => {
 
-                        Promise.all(formatSims()).then(sims => {
-
-                            let pop = sims[0]
-                            let hosp = sims[1]
-                            let mob = sims[2]
-                            let pow = sims[3]
-                            let sco = sims[4]
+                        //     let pop = sims[0]
+                        //     let hosp = sims[1]
+                        //     let mob = sims[2]
+                        //     let pow = sims[3]
+                        //     let sco = sims[4]
                     
-                            popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
-                            hospChart.updateChart(hospChart.quantFormatter(hosp), '#hosp-chart')
-                            mobChart.updateChart(mobChart.quantFormatter(mob), '#mob-chart')
-                            powChart.updateChart(powChart.quantFormatter(pow), '#pow-chart')
-                        })
+                        //     popChart.updateChart(popChart.quantFormatter(pop),'#pop-chart')
+                        //     hospChart.updateChart(hospChart.quantFormatter(hosp), '#hosp-chart')
+                        //     mobChart.updateChart(mobChart.quantFormatter(mob), '#mob-chart')
+                        //     powChart.updateChart(powChart.quantFormatter(pow), '#pow-chart')
+                        //     scoChart.updateChart(scoChart.quantFormatter(sco), '#sco-chart')
+                        // })
 
                         break;
                     case 'State':
 
                         mu.currentStatus.Type = 'State'
+                        mu.currentStatus.Location = mu.currentStatus.lastState
+                        // mu.updateTable(mu.currentStatus.lastState)
+
+                        // Need to update sims
+                        updateAll();
+
                         break;
 
                     case 'CWA':
 
                         mu.currentStatus.Type = 'CWA'
+                        mu.currentStatus.Location = mu.currentStatus.lastCWA
+                        // mu.updateTable(mu.currentStatus.lastCWA)
+
+                        // Need to update sims
+                        updateAll();
+
                         break;
 
                     case 'FEMA':
 
                         mu.currentStatus.Type = 'FEMA'
+                        mu.currentStatus.Location = mu.currentStatus.lastFEMA
+                        // mu.updateTable(mu.currentStatus.lastFEMA)
+
+                        // Need to update sims
+                        updateAll();
+
                         break;
 
                 }
@@ -351,7 +376,7 @@ export function makeMap() {
                 let loc;
                 let impact = mu.currentStatus.Impact;
                 let perc = mu.currentStatus.Percentile
-                // console.log('update')
+                console.log(mu.currentStatus)
                 // console.log(mu.currentStatus.Type)
 
                 try {
@@ -386,7 +411,7 @@ export function makeMap() {
 
 function onEachFeature(feature, layer) {
 
-    let du = update();
+    // let du = update();
 
     layer.on({
         mouseover: highlightFeature,
@@ -443,3 +468,18 @@ function selectFeature(e) {
     
     mu.locChange(loc);
 }
+
+function updateAll() {
+
+    let loc = mu.currentStatus.Location;
+    let levelstr = constants.ratDict[mu.currentStatus.Tornadoes]
+
+    mu.updateTable(loc)
+    mu.updateHistsnew(loc,levelstr)
+
+}
+
+$('#rating').on('change', () => {
+    mu.currentStatus.Tornadoes = $('#rating').val()
+    updateAll()
+});

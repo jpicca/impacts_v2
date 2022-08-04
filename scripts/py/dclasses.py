@@ -20,14 +20,6 @@ from pygridder import pygridder as pgrid
 
 path_root = os.path.dirname(__file__)
 
-# For error logging since we're now adding a bunch of new / crazy stuff
-logger = logging.getLogger(__name__)
-f_handler = logging.FileHandler(f'{path_root}/log/{datetime.now().strftime("%Y%m%d_%H%M%S")}.log')
-f_handler.setLevel(logging.ERROR)
-f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-f_handler.setFormatter(f_format)
-logger.addHandler(f_handler)
-
 
 _fips2state = {'01': 'AL', '04': 'AZ', '05': 'AR', '06': 'CA', '08': 'CO', '09': 'CT', '10': 'DE',
                '11': 'DC', '12': 'FL', '13': 'GA', '16': 'ID', '17': 'IL', '18': 'IN', '19': 'IA',
@@ -39,7 +31,7 @@ _fips2state = {'01': 'AL', '04': 'AZ', '05': 'AR', '06': 'CA', '08': 'CO', '09':
 
 _synthetic_tornado_fields = ["population", "distance", "rating", "states", 
         "counties", "wfos", "hospitals", "hospitalbeds", "mobileparks", 
-        "mobilehomes", "psubstations", "plines", "time", "slon", "slat", "elon", "elat"]
+        "mobilehomes", "psubstations", "plines", "schools", "time", "slon", "slat", "elon", "elat"]
 
 class TornadoDistributions(object):
     def __init__(self):
@@ -83,7 +75,7 @@ class hrrrGrids(object):
             self.empty_grid = self.gridder.make_empty_grid().astype(float)
         except Exception as e:
             print('There was an error reading the HRRR stack.')
-            logger.error(f'There was an error reading the HRRR stack. Perhaps it doesnt exist? More:\n{e}')
+            # logger.error(f'There was an error reading the HRRR stack. Perhaps it doesnt exist? More:\n{e}')
 
         self.twotorpolys = self._maskIndices(self.polypath)
         self.brm_grid = self._createBRMgrid()
@@ -107,7 +99,10 @@ class hrrrGrids(object):
     def _createBRMgrid(self):
         _brm_stack = []
 
-        for step in np.arange(24):
+        # for step in np.arange(24):
+
+        # New version uses the length of the step dimension to make sure we're creating the correct number of 2d brm grids
+        for step in np.arange(self.stack.dims['step']):
 
             _stepGrid = self.empty_grid.copy()
             _zip_list = [zip(x_idxs,y_idxs) for y_idxs,x_idxs in self.twotorpolys]
@@ -229,6 +224,7 @@ class ImpactGrids(object):
             self.mobileparks = NPZ["mparks"]
             self.psubstations = NPZ["pstations"]
             self.plines = NPZ["plines"]
+            self.schools = NPZ["schools"]
         self._lons1d = self.lons.ravel()
         self._lats1d = self.lats.ravel()
         self._x1d = self.X.ravel()
@@ -240,7 +236,7 @@ class ImpactGrids(object):
 
 class SyntheticTornado(object):
     def __init__(self, slon, slat, elon, elat, population, distance, rating, states, counties, wfos, hospitals,
-                 hospitalbeds, mobileparks, mobilehomes, psubstations, plines, time, loc_precision=4):
+                 hospitalbeds, mobileparks, mobilehomes, psubstations, plines, schools, time, loc_precision=4):
         self.slon = round(slon, loc_precision)
         self.slat = round(slat, loc_precision)
         self.elon = round(elon, loc_precision)
@@ -257,6 +253,7 @@ class SyntheticTornado(object):
         self.mobilehomes = mobilehomes
         self.psubstations = psubstations
         self.plines = plines
+        self.schools = schools
         self.time = time
 
     @property
@@ -291,6 +288,7 @@ class SyntheticTornadoRealization(object):
         self.mobilehomes = sum(s.mobilehomes for s in self.tornadoes)
         self.psubstations = sum(s.psubstations for s in self.tornadoes)
         self.plines = sum(s.plines for s in self.tornadoes)
+        self.schools = sum(s.schools for s in self.tornadoes)
 
     @property
     def __geo_interface__(self):
@@ -342,13 +340,12 @@ def simulate(inds, dists, ratings, direction, igrids, hgrids, hrgrids):
     slats += np.random.uniform(-0.05, 0.05, size=slats.shape[0])
 
     # Tornado time processing
-    # If we can't produce the normalized grid, 
     try:
         norm_h = hgrids.norm_grid
     except Exception as e:
 
         # log the error to file
-        logger.error(f'There was an error producing the normalized grid:\n{e}')
+        # logger.error(f'There was an error producing the normalized grid:\n{e}')
 
         # Set all tor times to a missing value
         tor_times = np.ones(len(idxs))*-9999
@@ -364,7 +361,12 @@ def simulate(inds, dists, ratings, direction, igrids, hgrids, hrgrids):
     # Use slon/slat to find grid box of the brm_grid and place into dirs variable
 
     hr_idxs = hrgrids.gridder.grid_points(slons, slats)
-    brm_time_idx = np.array(tor_times) - 12
+
+    # Subtract 12 to create proper index value (e.g., a UTC hour of 3 would be an index of -9, which would pick the 9th from last, which is 0300)
+    # brm_time_idx = np.array(tor_times) - 12
+    
+    # New version for 3-hourly BRM chunks (based off 8 HRRR ftimes, not 24 like the prior version)
+    brm_time_idx = np.floor((np.array(tor_times) - 12)/3).astype(int)
     brm_dirs = [hrgrids.brm_grid[brm_time_idx[i]][hr_idx[0]][hr_idx[1]] \
         for i, hr_idx in enumerate(hr_idxs)]
 
@@ -388,7 +390,9 @@ def simulate(inds, dists, ratings, direction, igrids, hgrids, hrgrids):
                                  igrids.hospitalbeds[idx].sum()),
                              int(igrids.mobileparks[idx].sum()), int(
                                  igrids.mobilehomes[idx].sum()),
-                             int(igrids.psubstations[idx].sum()), int(igrids.plines[idx].sum()),
+                             int(igrids.psubstations[idx].sum()), 
+                                int(igrids.plines[idx].sum()),
+                                int(igrids.schools[idx].sum()),
                              tor_times[i])
             for i, idx in enumerate(idxs)]
 

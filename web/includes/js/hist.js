@@ -7,6 +7,21 @@ export function formatSims() {
     let arr1, arr2, arr3;
     let pop,hosp,mob,pow,sco;
     let pop_arr = [], hosp_arr = [], mob_arr = [], pow_arr = [], sco_arr = [];
+    let pop_arr_n = [], hosp_arr_n = [], mob_arr_n = [], pow_arr_n = [], sco_arr_n = [];
+
+    // New block where we will format new sim files (for v3 version)
+
+    for (i=0;i<constants.nsims;i++) {
+
+        let sim = constants.newsims[i];
+        pop_arr_n.push(+sim.population);
+        hosp_arr_n.push(+sim.hospitals);
+        mob_arr_n.push(+sim.mobilehomes);
+        pow_arr_n.push(+sim.psubstations);
+        sco_arr_n.push(+sim.schools);
+    }
+
+    //
 
 
     // Might be worth exploring using danfo.js again here
@@ -48,9 +63,9 @@ export function formatSims() {
     // return new Promise((resolve,reject) => resolve(pop_arr, hosp_arr, mob_arr, pow_arr));
     
     // return new Promise((resolve,reject) => resolve(pop_arr, hosp_arr));
-    return [Promise.resolve(pop_arr), Promise.resolve(hosp_arr), 
-        Promise.resolve(mob_arr), Promise.resolve(pow_arr),
-        Promise.resolve(sco_arr)];
+    return [Promise.resolve(pop_arr_n), Promise.resolve(hosp_arr_n), 
+        Promise.resolve(mob_arr_n), Promise.resolve(pow_arr_n),
+        Promise.resolve(sco_arr_n)];
 }
 
 
@@ -189,12 +204,20 @@ export class histogram extends charts {
 
         this.xScaleDom = (data,isMob=false) => {
 
+            if (isMob) {
+                if (d3.max(data) > 250) {
+                    return [0,d3.max(data)+1]
+                } else {
+                    return [0,251]
+                }
+            }
+
             if (d3.max(data) > 10) {
                 return [0,d3.max(data)+1]
             } else {
-                if (isMob) {
-                    return [0,250]
-                }
+                // if (isMob) {
+                //     return [0,250]
+                // }
                 return [0,10]
             }
         }
@@ -218,6 +241,7 @@ export class histogram extends charts {
                             for(let i = 0; i <= 10; i++){
                                 arr.push(i*step);
                             }
+                            console.log(arr)
                             return arr;
                         }
                         
@@ -281,3 +305,4 @@ export var popChart = new histogram()
 export var hospChart = new histogram()
 export var mobChart = new histogram()
 export var powChart = new histogram()
+export var scoChart = new histogram()

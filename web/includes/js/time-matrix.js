@@ -1,4 +1,4 @@
-import constants, { fillColorDict, fillColorTime} from './const.js'
+import constants, { fillColorDict } from './const.js'
 
 var margin = { top: 30, right: 0, bottom: 0, left: 30 }
 var rat_margin = { top: 30, right: 10, bottom: 0, left: 30}
