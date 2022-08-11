@@ -25,6 +25,7 @@ CURDATA_DIR="/data/cur-data"
 PAS_SCRIPT=$SCRIPT_DIR"/py/pas.py"
 NPZ_SCRIPT=$SCRIPT_DIR"/py/processNPZ.py"
 STA_SCRIPT=$SCRIPT_DIR"/py/makestats.py"
+CAS_SCRIPT=$SCRIPT_DIR"/py/injfat.py"
 IMPACTS_DATA=$DIR_ROOT$SCRIPT_DIR"/impacts-data/"
 HREF=$DIR_ROOT$CURDATA_DIR"/href/"
 HRRR=$DIR_ROOT$CURDATA_DIR"/hrrr-stack/"
@@ -63,7 +64,9 @@ echo $OUTLOOK_TS
 # $PYTHON $DIR_ROOT$PAS_SCRIPT -f $OTLK_FILE -n $N_SIMS -p $IMPACTS_DATA -hr $HREF -hrr $HRRR -t $OUTLOOK_TIME -ig $GRIB
 
 # Run the stat maker
-echo "***Post processing PAS output for web viz tornado stats..."
-$PYTHON $DIR_ROOT$STA_SCRIPT -f $IMPACTS_DATA"/output/"$OUTLOOK_TS".psv.gz" -r $DIR_ROOT$SCRIPT_DIR -d $DAY
+# echo "***Post processing PAS output for web viz tornado stats..."
+# $PYTHON $DIR_ROOT$STA_SCRIPT -f $IMPACTS_DATA"/output/"$OUTLOOK_TS".psv.gz" -r $DIR_ROOT$SCRIPT_DIR -d $DAY
 
 ## After running PAS, need a script to calculate estimate injuries and fatalities
+# echo "***Post processing PAS output for casualty estimation..."
+$PYTHON_INJFAT $DIR_ROOT$CAS_SCRIPT -f $IMPACTS_DATA"/output/"$OUTLOOK_TS".psv.gz" -o $DIR_ROOT"/web/includes/data/cas" -d $DAY
