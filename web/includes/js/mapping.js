@@ -477,6 +477,8 @@ function updateAll() {
     mu.updateTable(loc)
     mu.updateHistsnew(loc,levelstr)
 
+    mu.updateInjFat(loc);
+
 }
 
 $('#rating').on('change', () => {

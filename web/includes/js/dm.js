@@ -56,6 +56,8 @@ dataManager.Manager = function module() {
                 if (this.readyState == 4 && this.status == 200) {
                     response = this.responseText;
                     resolve(response)
+                } else if (this.readyState == 4 && this.status == 404){
+                    reject(new Error('Whoopsy Daisy'))
                 }
             };
             xhttp.open("GET", file, true);

@@ -181,6 +181,13 @@ def addregions(dfinj,dffat,scope):
     
         inj_thing = idf[idf['category'] == thing]
         fat_thing = fdf[fdf['category'] == thing]
+
+        timeAndInj = inj_thing[inj_thing['num_inj'] > 0][['time','num_inj']]
+        timeAndFat = fat_thing[fat_thing['num_fat'] > 0][['time','num_fat']]
+        timeAndInjPath = outdir.joinpath(f'timeinj_{thing}.csv')
+        timeAndFatPath = outdir.joinpath(f'timefat_{thing}.csv')
+        timeAndInj.to_csv(timeAndInjPath, index=False)
+        timeAndFat.to_csv(timeAndFatPath, index=False)
         
         inj_thing = inj_thing.groupby('sim').sum().reindex(list(range(1,nsims+1)),fill_value=0)
         fat_thing = fat_thing.groupby('sim').sum().reindex(list(range(1,nsims+1)),fill_value=0)
@@ -198,6 +205,13 @@ data.formatdf(rename)
 
 dfinj = data.makeprediction(cas='i')
 dffat = data.makeprediction(cas='f')
+
+timeAndInj = dfinj[dfinj['num_inj'] > 0][['time','num_inj']]
+timeAndFat = dffat[dffat['num_fat'] > 0][['time','num_fat']]
+timeAndInjPath = outdir.joinpath('day1-timeinj.csv')
+timeAndFatPath = outdir.joinpath('day1-timefat.csv')
+timeAndInj.to_csv(timeAndInjPath, index=False)
+timeAndFat.to_csv(timeAndFatPath, index=False)
 
 
 ## ****************************** ##

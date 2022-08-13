@@ -2,13 +2,13 @@
 import constants from './const.js'
 import {drawGrids,updatePoints} from './time-matrix.js'
 import {popChart,hospChart,mobChart,powChart,scoChart,formatSims,adjustDist} from './hist.js'
+import * as Plot from "https://cdn.skypack.dev/@observablehq/plot@0.5";
+import tickPlot, { formatJson, dotPlot } from './plot.js';
 
 export default function module() {
 
     let exports = {}
     let dm = dataManager.Manager();
-
-    console.log('hello')
 
     exports.currentStatus = {
         'Location': 'National',
@@ -104,6 +104,84 @@ export default function module() {
 
     // }
 
+    exports.updateInjFat = async function(loc) {
+
+        console.log('starting injfat update')
+
+        let jsonText, response, respinj, respfat;
+        let inj = document.querySelector('#inj');
+        let fat = document.querySelector('#fat');
+        let injsvg = document.querySelector('#inj svg');
+        let fatsvg = document.querySelector('#fat svg');
+
+        let injtime = document.querySelector('#injtime');
+        let fattime = document.querySelector('#fattime');
+        let injtimesvg = document.querySelector('#injtime svg');
+        let fattimesvg = document.querySelector('#fattime svg');
+
+        try {
+            injsvg.remove();
+        } catch (err) {
+            console.log('Nothing to remove!')
+        }
+
+        try {
+            fatsvg.remove();
+        } catch (err) {
+            console.log('Nothing to remove!')
+        }
+
+        try {
+            injtimesvg.remove();
+        } catch (err) {
+            console.log('Nothing to remove!')
+        }
+
+        try {
+            fattimesvg.remove();
+        } catch (err) {
+            console.log('Nothing to remove!')
+        }
+
+        console.log('requesting next file')
+
+        try {
+            let response = await dm.readJson(`${constants.simdataroot}cas/cas_${loc}.json`)
+            jsonText = JSON.parse(response)
+            console.log(jsonText)
+        } catch (err) {
+            console.log('No cas file!')
+            jsonText = {
+                num_inj: {1: 0},
+                num_fat: {1: 0}
+            }
+        }
+
+        try {
+            respinj = await dm.readCsv(`${constants.simdataroot}cas/timeinj_${loc}.csv`)
+        } catch (err) {
+            console.log('No inj time file!')
+            respinj = []
+        }
+
+        try {
+            respfat = await dm.readCsv(`${constants.simdataroot}cas/timefat_${loc}.csv`)
+        } catch (err) {
+            console.log('No fat time file!')
+            respfat = []
+        }
+
+        console.log(jsonText)
+        inj.append(Plot.plot(tickPlot(formatJson(jsonText,'num_inj'),'Injuries')));
+        fat.append(Plot.plot(tickPlot(formatJson(jsonText,'num_fat'),'Fatalities')));
+
+        injtime.append(Plot.plot(dotPlot(respinj)));
+        fattime.append(Plot.plot(dotPlot(respfat, 'Fatalities')));
+
+        // inj.append(Plot.plot(tickPlot(formatJson(jsonText4,'num_inj'),'Injuries')));
+
+    }
+
     exports.updateHistsnew = async function(loc,levelstr) {
 
         let containers = d3.selectAll('.chart');
@@ -181,6 +259,8 @@ export default function module() {
         exports.updateTable(loc);
 
         exports.updateHistsnew(loc,levelstr);
+
+        exports.updateInjFat(loc);
 
         // let containers = d3.selectAll('.chart');
 

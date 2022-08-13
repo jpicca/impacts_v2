@@ -2,6 +2,9 @@ import constants from './const.js'
 import update from './update.js'
 import {makeMap} from './mapping.js'
 import {formatSims,popChart,hospChart,mobChart,powChart,scoChart} from './hist.js'
+import * as Plot from "https://cdn.skypack.dev/@observablehq/plot@0.5";
+import tickPlot, { formatJson, dotPlot } from './plot.js';
+
 
 // for ( let i = 1; i < constants.nsims + 1; i++) { constants.sim_range.push(i) }
 var dm, du;
@@ -18,7 +21,20 @@ $(window).on('load', async function() {
     // let response = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_schoolsfema.json`)
     let response = await dm.readJson(`${constants.simdataroot}init/data.json`)
     let jsonText = JSON.parse(response)
+    
+    // Reading injury / fatality data by simulation
+    let response4 = await dm.readJson(`${constants.simdataroot}cas/day1-injfat.json`)
+    let jsonText4 = JSON.parse(response4)
+    console.log(jsonText4)
 
+    // Reading injury / fatality data by tornado
+    let response5 = await dm.readCsv(`${constants.simdataroot}cas/day1-timeinj.csv`)
+    console.log(response5)
+    let response6 = await dm.readCsv(`${constants.simdataroot}cas/day1-timefat.csv`)
+
+
+
+    // *** response2 and response3 are likely no longer needed -- review if they are **
     // json containing data for impacts timing information ... probably will change how we use timing data
     let response2 = await dm.readJson(`../data/output/examples/${constants.date}/processed/jsonResponse_time_sum_schoolsfema.json`)
     let jsonText2 = JSON.parse(response2)
@@ -34,14 +50,9 @@ $(window).on('load', async function() {
             
         console.log('No file!')
 
-        // Remove svg if it exists and add a banner about no tornadoes
-        // containers.select('svg').remove();
         let containers = d3.selectAll('.chart')
         containers.select('svg').attr('display','none')
         containers.selectAll('.no-tor').style('visibility','visible')
-        // containers.append('h4')
-        //     .attr('class','notortext')
-        //     .text('No simulated tornadoes')
 
         constants.newsims = [];
 
@@ -55,7 +66,7 @@ $(window).on('load', async function() {
     constants.sims = jsonText3;
 
     console.log(simresponse);
-    console.log(constants.sims);
+    console.log(jsonText4);
 
     // Need to edit quants json file to be broken down by 'all', 'weak', 'sig', 'violent'
     du.updateTable('National')
@@ -63,6 +74,26 @@ $(window).on('load', async function() {
     // makeMatrix()
     // makeScatter()
     makeMap()
+
+
+    // Make injury plot
+    let inj = document.querySelector('#inj');
+    inj.append(Plot.plot(tickPlot(formatJson(jsonText4,'num_inj'),'Injuries')));
+
+    // Make fatality plot
+    let fat = document.querySelector('#fat');
+    fat.append(Plot.plot(tickPlot(formatJson(jsonText4,'num_fat'),'Fatalities')));
+
+    // Make injury time plot
+    let injtime = document.querySelector('#injtime');
+    injtime.append(Plot.plot(dotPlot(response5)));
+
+    // Make fatality time plot
+    let fattime = document.querySelector('#fattime');
+    fattime.append(Plot.plot(dotPlot(response6,'Fatalities')));
+
+
+
 
     Promise.all(formatSims()).then(sims => {
 
