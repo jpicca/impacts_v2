@@ -23,14 +23,14 @@ $(window).on('load', async function() {
     let jsonText = JSON.parse(response)
     
     // Reading injury / fatality data by simulation
-    let response4 = await dm.readJson(`${constants.simdataroot}cas/day1-injfat.json`)
+    let response4 = await dm.readJson(`${constants.simdataroot}cas/cas_national.json`)
     let jsonText4 = JSON.parse(response4)
     console.log(jsonText4)
 
     // Reading injury / fatality data by tornado
-    let response5 = await dm.readCsv(`${constants.simdataroot}cas/day1-timeinj.csv`)
+    let response5 = await dm.readCsv(`${constants.simdataroot}cas/timeinj_national.csv`)
     console.log(response5)
-    let response6 = await dm.readCsv(`${constants.simdataroot}cas/day1-timefat.csv`)
+    let response6 = await dm.readCsv(`${constants.simdataroot}cas/timefat_national.csv`)
 
 
 

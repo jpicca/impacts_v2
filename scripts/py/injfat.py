@@ -4,6 +4,7 @@ import pickle
 import pathlib
 import argparse
 import json
+import csv
 import numpy as np
 from helper import addfema
 
@@ -29,7 +30,8 @@ args = parser.parse_args()
 f = pathlib.Path(args.file)
 mlpath = pathlib.Path(args.path)
 outdir = pathlib.Path(args.outpath)
-outfile = outdir.joinpath('day1-injfat.json')
+# outfile = outdir.joinpath('day1-injfat.json')
+outfile = outdir.joinpath('cas_national.json')
 day = args.day
 
 if day != 1:
@@ -47,6 +49,25 @@ except pd.errors.EmptyDataError:
 
     # Write out a csv file with 0s for both injuries and fatalities
     # here
+    emptyJson = {
+        "num_inj": {"1": 0.0},
+        "num_fat": {"1": 0.0}
+    }
+
+    with open(outfile, 'w') as out:
+        json.dump(emptyJson,out)
+
+    with open(outdir.joinpath('timeinj_national.csv'),'w') as out:
+        writer = csv.writer(out)
+
+        writer.writerow(['time','num_inj'])
+        writer.writerow([])
+
+    with open(outdir.joinpath('timefat_national.csv'),'w') as out:
+        writer = csv.writer(out)
+
+        writer.writerow(['time','num_fat'])
+        writer.writerow([])
 
     sys.exit(0)
 
@@ -60,7 +81,7 @@ class Predictor(object):
         self._features = self._sims.columns
         self._numtors = self._sims.shape[0]
         
-        with open(mlpath.joinpath('injclass.model'), 'rb') as f:
+        with open(mlpath.joinpath('injclass_aug22.model'), 'rb') as f:
             self.iclass = pickle.load(f)
         
         with open(mlpath.joinpath('injreg.model'), 'rb') as f:
@@ -208,8 +229,8 @@ dffat = data.makeprediction(cas='f')
 
 timeAndInj = dfinj[dfinj['num_inj'] > 0][['time','num_inj']]
 timeAndFat = dffat[dffat['num_fat'] > 0][['time','num_fat']]
-timeAndInjPath = outdir.joinpath('day1-timeinj.csv')
-timeAndFatPath = outdir.joinpath('day1-timefat.csv')
+timeAndInjPath = outdir.joinpath('timeinj-national.csv')
+timeAndFatPath = outdir.joinpath('timefat-national.csv')
 timeAndInj.to_csv(timeAndInjPath, index=False)
 timeAndFat.to_csv(timeAndFatPath, index=False)
 

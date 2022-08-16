@@ -245,6 +245,8 @@ export function makeMap() {
                         mu.currentStatus.Location = 'National'
                         // mu.updateTable('National')
 
+                        map.fitBounds(statesLayer.getBounds());
+
                         // let title = document.getElementById('prob-dist-title')
                         // title.innerText = 'Tornado Impact Distributions (National)'
 
